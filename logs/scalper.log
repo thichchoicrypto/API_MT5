@@ -1,0 +1,889 @@
+2026-06-20 12:37:51 | INFO     | __main__:main:170 - MT5 Scalper Bot | mode=download | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 12:42:09 | INFO     | __main__:main:697 - MT5 Scalper | mode=download | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 12:42:09 | ERROR    | phase1_data.database:connect:183 - DB connect failed (attempt 1/5): role "postgres" does not exist
+2026-06-20 12:42:10 | ERROR    | phase1_data.database:connect:183 - DB connect failed (attempt 2/5): role "postgres" does not exist
+2026-06-20 12:42:12 | ERROR    | phase1_data.database:connect:183 - DB connect failed (attempt 3/5): role "postgres" does not exist
+2026-06-20 12:42:16 | ERROR    | phase1_data.database:connect:183 - DB connect failed (attempt 4/5): role "postgres" does not exist
+2026-06-20 12:42:24 | ERROR    | phase1_data.database:connect:183 - DB connect failed (attempt 5/5): role "postgres" does not exist
+2026-06-20 12:43:17 | INFO     | __main__:main:697 - MT5 Scalper | mode=download | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 12:43:17 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 12:43:21 | INFO     | phase1_data.yfinance_downloader:connect:33 - YFinanceDownloader ready
+2026-06-20 12:43:21 | INFO     | __main__:run_download:76 - Full download: EURUSD 15m (insufficient history in DB)
+2026-06-20 12:43:21 | WARNING  | phase1_data.yfinance_downloader:_download_sync:66 - [EURUSD 15m] yfinance giới hạn 60 ngày. Start capped: 2024-06-20 → 2026-04-21
+2026-06-20 12:43:21 | INFO     | phase1_data.yfinance_downloader:_download_sync:72 - yfinance downloading EURUSD (EURUSD=X) 15m từ 2026-04-21 ...
+2026-06-20 12:43:23 | WARNING  | phase1_data.yfinance_downloader:_download_sync:87 - yfinance không có data EURUSD 15m
+2026-06-20 12:43:23 | WARNING  | __main__:run_download:85 - No data returned for EURUSD 15m
+2026-06-20 12:43:23 | INFO     | __main__:run_download:76 - Full download: EURUSD 1h (insufficient history in DB)
+2026-06-20 12:43:23 | INFO     | phase1_data.yfinance_downloader:_download_sync:72 - yfinance downloading EURUSD (EURUSD=X) 1h từ 2024-06-20 ...
+2026-06-20 12:43:23 | WARNING  | phase1_data.yfinance_downloader:_download_sync:87 - yfinance không có data EURUSD 1h
+2026-06-20 12:43:23 | WARNING  | __main__:run_download:85 - No data returned for EURUSD 1h
+2026-06-20 12:43:23 | INFO     | __main__:run_download:76 - Full download: GBPUSD 15m (insufficient history in DB)
+2026-06-20 12:43:23 | WARNING  | phase1_data.yfinance_downloader:_download_sync:66 - [GBPUSD 15m] yfinance giới hạn 60 ngày. Start capped: 2024-06-20 → 2026-04-21
+2026-06-20 12:43:23 | INFO     | phase1_data.yfinance_downloader:_download_sync:72 - yfinance downloading GBPUSD (GBPUSD=X) 15m từ 2026-04-21 ...
+2026-06-20 12:43:24 | WARNING  | phase1_data.yfinance_downloader:_download_sync:87 - yfinance không có data GBPUSD 15m
+2026-06-20 12:43:24 | WARNING  | __main__:run_download:85 - No data returned for GBPUSD 15m
+2026-06-20 12:43:24 | INFO     | __main__:run_download:76 - Full download: GBPUSD 1h (insufficient history in DB)
+2026-06-20 12:43:24 | INFO     | phase1_data.yfinance_downloader:_download_sync:72 - yfinance downloading GBPUSD (GBPUSD=X) 1h từ 2024-06-20 ...
+2026-06-20 12:43:24 | WARNING  | phase1_data.yfinance_downloader:_download_sync:87 - yfinance không có data GBPUSD 1h
+2026-06-20 12:43:24 | WARNING  | __main__:run_download:85 - No data returned for GBPUSD 1h
+2026-06-20 12:43:24 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 12:43:24 | INFO     | __main__:run_download:89 - Download complete
+2026-06-20 12:44:43 | INFO     | __main__:main:697 - MT5 Scalper | mode=download | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 12:44:43 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 12:44:44 | INFO     | phase1_data.yfinance_downloader:connect:51 - YFinanceDownloader ready
+2026-06-20 12:44:44 | INFO     | __main__:run_download:76 - Full download: EURUSD 15m (insufficient history in DB)
+2026-06-20 12:44:44 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading EURUSD (EURUSD=X) 15m period=60d ...
+2026-06-20 12:44:45 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 5531 candles cho EURUSD 15m
+2026-06-20 12:44:45 | INFO     | __main__:run_download:83 - Saved 5531 candles for EURUSD 15m
+2026-06-20 12:44:45 | INFO     | __main__:run_download:76 - Full download: EURUSD 1h (insufficient history in DB)
+2026-06-20 12:44:45 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading EURUSD (EURUSD=X) 1h period=2y ...
+2026-06-20 12:44:45 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 12205 candles cho EURUSD 1h
+2026-06-20 12:44:46 | INFO     | __main__:run_download:83 - Saved 12205 candles for EURUSD 1h
+2026-06-20 12:44:46 | INFO     | __main__:run_download:76 - Full download: GBPUSD 15m (insufficient history in DB)
+2026-06-20 12:44:46 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading GBPUSD (GBPUSD=X) 15m period=60d ...
+2026-06-20 12:44:46 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 5531 candles cho GBPUSD 15m
+2026-06-20 12:44:46 | INFO     | __main__:run_download:83 - Saved 5531 candles for GBPUSD 15m
+2026-06-20 12:44:46 | INFO     | __main__:run_download:76 - Full download: GBPUSD 1h (insufficient history in DB)
+2026-06-20 12:44:46 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading GBPUSD (GBPUSD=X) 1h period=2y ...
+2026-06-20 12:44:47 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 12206 candles cho GBPUSD 1h
+2026-06-20 12:44:47 | INFO     | __main__:run_download:83 - Saved 12206 candles for GBPUSD 1h
+2026-06-20 12:44:47 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 12:44:47 | INFO     | __main__:run_download:89 - Download complete
+2026-06-20 12:47:04 | INFO     | __main__:main:697 - MT5 Scalper | mode=download | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 12:47:04 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 12:47:04 | INFO     | phase1_data.yfinance_downloader:connect:51 - YFinanceDownloader ready
+2026-06-20 12:47:05 | INFO     | __main__:run_download:76 - Full download: EURUSD 15m (insufficient history in DB)
+2026-06-20 12:47:05 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading EURUSD (EURUSD=X) 15m period=60d ...
+2026-06-20 12:47:06 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 5531 candles cho EURUSD 15m
+2026-06-20 12:47:06 | INFO     | __main__:run_download:83 - Saved 5531 candles for EURUSD 15m
+2026-06-20 12:47:06 | INFO     | __main__:run_download:78 - Incremental update: EURUSD 1h from 2026-06-19
+2026-06-20 12:47:06 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading EURUSD (EURUSD=X) 1h period=2y ...
+2026-06-20 12:47:06 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 0 candles cho EURUSD 1h
+2026-06-20 12:47:06 | WARNING  | __main__:run_download:85 - No data returned for EURUSD 1h
+2026-06-20 12:47:06 | INFO     | __main__:run_download:76 - Full download: GBPUSD 15m (insufficient history in DB)
+2026-06-20 12:47:06 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading GBPUSD (GBPUSD=X) 15m period=60d ...
+2026-06-20 12:47:07 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 5531 candles cho GBPUSD 15m
+2026-06-20 12:47:07 | INFO     | __main__:run_download:83 - Saved 5531 candles for GBPUSD 15m
+2026-06-20 12:47:07 | INFO     | __main__:run_download:78 - Incremental update: GBPUSD 1h from 2026-06-19
+2026-06-20 12:47:07 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading GBPUSD (GBPUSD=X) 1h period=2y ...
+2026-06-20 12:47:11 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 0 candles cho GBPUSD 1h
+2026-06-20 12:47:11 | WARNING  | __main__:run_download:85 - No data returned for GBPUSD 1h
+2026-06-20 12:47:11 | INFO     | __main__:run_download:76 - Full download: USDJPY 15m (insufficient history in DB)
+2026-06-20 12:47:11 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading USDJPY (USDJPY=X) 15m period=60d ...
+2026-06-20 12:47:11 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 5531 candles cho USDJPY 15m
+2026-06-20 12:47:11 | INFO     | __main__:run_download:83 - Saved 5531 candles for USDJPY 15m
+2026-06-20 12:47:11 | INFO     | __main__:run_download:76 - Full download: USDJPY 1h (insufficient history in DB)
+2026-06-20 12:47:11 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading USDJPY (USDJPY=X) 1h period=2y ...
+2026-06-20 12:47:12 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 12191 candles cho USDJPY 1h
+2026-06-20 12:47:12 | INFO     | __main__:run_download:83 - Saved 12191 candles for USDJPY 1h
+2026-06-20 12:47:12 | INFO     | __main__:run_download:76 - Full download: XAUUSD 15m (insufficient history in DB)
+2026-06-20 12:47:12 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading XAUUSD (GC=F) 15m period=60d ...
+2026-06-20 12:47:13 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 4550 candles cho XAUUSD 15m
+2026-06-20 12:47:13 | INFO     | __main__:run_download:83 - Saved 4550 candles for XAUUSD 15m
+2026-06-20 12:47:13 | INFO     | __main__:run_download:76 - Full download: XAUUSD 1h (insufficient history in DB)
+2026-06-20 12:47:13 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading XAUUSD (GC=F) 1h period=2y ...
+2026-06-20 12:47:14 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 11423 candles cho XAUUSD 1h
+2026-06-20 12:47:14 | INFO     | __main__:run_download:83 - Saved 11423 candles for XAUUSD 1h
+2026-06-20 12:47:14 | INFO     | __main__:run_download:76 - Full download: USDCAD 15m (insufficient history in DB)
+2026-06-20 12:47:14 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading USDCAD (USDCAD=X) 15m period=60d ...
+2026-06-20 12:47:14 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 5531 candles cho USDCAD 15m
+2026-06-20 12:47:15 | INFO     | __main__:run_download:83 - Saved 5531 candles for USDCAD 15m
+2026-06-20 12:47:15 | INFO     | __main__:run_download:76 - Full download: USDCAD 1h (insufficient history in DB)
+2026-06-20 12:47:15 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading USDCAD (USDCAD=X) 1h period=2y ...
+2026-06-20 12:47:15 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 12263 candles cho USDCAD 1h
+2026-06-20 12:47:16 | INFO     | __main__:run_download:83 - Saved 12263 candles for USDCAD 1h
+2026-06-20 12:47:16 | INFO     | __main__:run_download:76 - Full download: USDCHF 15m (insufficient history in DB)
+2026-06-20 12:47:16 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading USDCHF (USDCHF=X) 15m period=60d ...
+2026-06-20 12:47:16 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 5531 candles cho USDCHF 15m
+2026-06-20 12:47:16 | INFO     | __main__:run_download:83 - Saved 5531 candles for USDCHF 15m
+2026-06-20 12:47:16 | INFO     | __main__:run_download:76 - Full download: USDCHF 1h (insufficient history in DB)
+2026-06-20 12:47:16 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading USDCHF (USDCHF=X) 1h period=2y ...
+2026-06-20 12:47:17 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 12210 candles cho USDCHF 1h
+2026-06-20 12:47:18 | INFO     | __main__:run_download:83 - Saved 12210 candles for USDCHF 1h
+2026-06-20 12:47:18 | INFO     | __main__:run_download:76 - Full download: EURJPY 15m (insufficient history in DB)
+2026-06-20 12:47:18 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading EURJPY (EURJPY=X) 15m period=60d ...
+2026-06-20 12:47:18 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 5531 candles cho EURJPY 15m
+2026-06-20 12:47:18 | INFO     | __main__:run_download:83 - Saved 5531 candles for EURJPY 15m
+2026-06-20 12:47:18 | INFO     | __main__:run_download:76 - Full download: EURJPY 1h (insufficient history in DB)
+2026-06-20 12:47:18 | INFO     | phase1_data.yfinance_downloader:_download_sync:76 - yfinance downloading EURJPY (EURJPY=X) 1h period=2y ...
+2026-06-20 12:47:19 | INFO     | phase1_data.yfinance_downloader:_download_sync:131 - yfinance downloaded 12214 candles cho EURJPY 1h
+2026-06-20 12:47:19 | INFO     | __main__:run_download:83 - Saved 12214 candles for EURJPY 1h
+2026-06-20 12:47:19 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 12:47:19 | INFO     | __main__:run_download:89 - Download complete
+2026-06-20 12:49:25 | INFO     | __main__:main:697 - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 12:49:26 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 12:49:26 | WARNING  | __main__:run_backtest_multi:252 - Insufficient data for EURUSD, skipping
+2026-06-20 12:49:26 | WARNING  | __main__:run_backtest_multi:252 - Insufficient data for GBPUSD, skipping
+2026-06-20 12:49:26 | WARNING  | __main__:run_backtest_multi:252 - Insufficient data for USDJPY, skipping
+2026-06-20 12:49:26 | WARNING  | __main__:run_backtest_multi:252 - Insufficient data for XAUUSD, skipping
+2026-06-20 12:49:26 | WARNING  | __main__:run_backtest_multi:252 - Insufficient data for USDCAD, skipping
+2026-06-20 12:49:26 | WARNING  | __main__:run_backtest_multi:252 - Insufficient data for USDCHF, skipping
+2026-06-20 12:49:26 | WARNING  | __main__:run_backtest_multi:252 - Insufficient data for EURJPY, skipping
+2026-06-20 12:49:26 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 12:49:29 | INFO     | __main__:main:697 - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 12:49:29 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 12:49:29 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURUSD 15m — 5531 candles
+2026-06-20 12:49:35 | INFO     | __main__:run_backtest_multi:261 - Saving 10731 tracker records for EURUSD ...
+2026-06-20 12:49:39 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10731 candle_tracker_backtest records
+2026-06-20 12:49:39 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: GBPUSD 15m — 5531 candles
+2026-06-20 12:49:46 | INFO     | __main__:run_backtest_multi:261 - Saving 10174 tracker records for GBPUSD ...
+2026-06-20 12:49:50 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10174 candle_tracker_backtest records
+2026-06-20 12:49:50 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDJPY 15m — 5531 candles
+2026-06-20 12:49:55 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 15.9% hit — disabling trading
+2026-06-20 12:49:56 | INFO     | __main__:run_backtest_multi:261 - Saving 6843 tracker records for USDJPY ...
+2026-06-20 12:51:39 | INFO     | __main__:main:697 - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 12:51:39 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 12:51:39 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURUSD 1h — 12205 candles
+2026-06-20 12:51:40 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-791.98) — disabling trading
+2026-06-20 12:51:45 | INFO     | __main__:run_backtest_multi:261 - Saving 23329 tracker records for EURUSD ...
+2026-06-20 12:51:53 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23329 candle_tracker_backtest records
+2026-06-20 12:51:53 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: GBPUSD 1h — 12206 candles
+2026-06-20 12:52:00 | INFO     | __main__:run_backtest_multi:261 - Saving 23283 tracker records for GBPUSD ...
+2026-06-20 12:52:09 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23283 candle_tracker_backtest records
+2026-06-20 12:52:09 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDJPY 1h — 12191 candles
+2026-06-20 12:52:13 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 15.3% hit — disabling trading
+2026-06-20 12:52:15 | INFO     | __main__:run_backtest_multi:261 - Saving 14374 tracker records for USDJPY ...
+2026-06-20 12:52:20 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 14374 candle_tracker_backtest records
+2026-06-20 12:52:20 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: XAUUSD 1h — 11423 candles
+2026-06-20 12:52:25 | INFO     | __main__:run_backtest_multi:261 - Saving 22333 tracker records for XAUUSD ...
+2026-06-20 12:52:33 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 22333 candle_tracker_backtest records
+2026-06-20 12:52:34 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCAD 1h — 12263 candles
+2026-06-20 12:52:40 | INFO     | __main__:run_backtest_multi:261 - Saving 24016 tracker records for USDCAD ...
+2026-06-20 12:52:48 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 24016 candle_tracker_backtest records
+2026-06-20 12:52:48 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCHF 1h — 12210 candles
+2026-06-20 12:52:55 | INFO     | __main__:run_backtest_multi:261 - Saving 23832 tracker records for USDCHF ...
+2026-06-20 12:53:04 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23832 candle_tracker_backtest records
+2026-06-20 12:53:04 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURJPY 1h — 12214 candles
+2026-06-20 12:53:11 | INFO     | __main__:run_backtest_multi:261 - Saving 23809 tracker records for EURJPY ...
+2026-06-20 12:53:20 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23809 candle_tracker_backtest records
+2026-06-20 12:53:20 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 12:55:31 | INFO     | __main__:main:697 - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 12:55:31 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 12:55:31 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURUSD 15m — 5531 candles
+2026-06-20 12:55:37 | INFO     | __main__:run_backtest_multi:261 - Saving 10731 tracker records for EURUSD ...
+2026-06-20 12:55:40 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10731 candle_tracker_backtest records
+2026-06-20 12:55:40 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: GBPUSD 15m — 5531 candles
+2026-06-20 12:55:47 | INFO     | __main__:run_backtest_multi:261 - Saving 10174 tracker records for GBPUSD ...
+2026-06-20 12:55:51 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10174 candle_tracker_backtest records
+2026-06-20 12:55:51 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDJPY 15m — 5531 candles
+2026-06-20 12:55:56 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 15.9% hit — disabling trading
+2026-06-20 12:55:57 | INFO     | __main__:run_backtest_multi:261 - Saving 6843 tracker records for USDJPY ...
+2026-06-20 12:56:00 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 6843 candle_tracker_backtest records
+2026-06-20 12:56:00 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: XAUUSD 15m — 4550 candles
+2026-06-20 12:56:02 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-604.33) — disabling trading
+2026-06-20 12:56:05 | INFO     | __main__:run_backtest_multi:261 - Saving 8751 tracker records for XAUUSD ...
+2026-06-20 12:56:08 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 8751 candle_tracker_backtest records
+2026-06-20 12:56:09 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCAD 15m — 5531 candles
+2026-06-20 12:56:15 | INFO     | __main__:run_backtest_multi:261 - Saving 10919 tracker records for USDCAD ...
+2026-06-20 12:56:19 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10919 candle_tracker_backtest records
+2026-06-20 12:56:19 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCHF 15m — 5531 candles
+2026-06-20 12:56:26 | INFO     | __main__:run_backtest_multi:261 - Saving 10744 tracker records for USDCHF ...
+2026-06-20 12:56:29 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10744 candle_tracker_backtest records
+2026-06-20 12:56:29 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURJPY 15m — 5531 candles
+2026-06-20 12:56:37 | INFO     | __main__:run_backtest_multi:261 - Saving 10635 tracker records for EURJPY ...
+2026-06-20 12:56:40 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10635 candle_tracker_backtest records
+2026-06-20 12:56:40 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 12:58:28 | INFO     | __main__:main:697 - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 12:58:28 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 12:58:29 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURUSD 15m — 5531 candles
+2026-06-20 12:58:35 | INFO     | __main__:run_backtest_multi:261 - Saving 10731 tracker records for EURUSD ...
+2026-06-20 12:58:38 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10731 candle_tracker_backtest records
+2026-06-20 12:58:38 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: GBPUSD 15m — 5531 candles
+2026-06-20 12:58:45 | INFO     | __main__:run_backtest_multi:261 - Saving 10174 tracker records for GBPUSD ...
+2026-06-20 12:58:49 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10174 candle_tracker_backtest records
+2026-06-20 12:58:49 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDJPY 15m — 5531 candles
+2026-06-20 12:58:56 | INFO     | __main__:run_backtest_multi:261 - Saving 9992 tracker records for USDJPY ...
+2026-06-20 12:59:00 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 9992 candle_tracker_backtest records
+2026-06-20 12:59:00 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: XAUUSD 15m — 4550 candles
+2026-06-20 12:59:02 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-604.33) — disabling trading
+2026-06-20 12:59:06 | INFO     | __main__:run_backtest_multi:261 - Saving 8751 tracker records for XAUUSD ...
+2026-06-20 12:59:09 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 8751 candle_tracker_backtest records
+2026-06-20 12:59:09 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCAD 15m — 5531 candles
+2026-06-20 12:59:15 | INFO     | __main__:run_backtest_multi:261 - Saving 10919 tracker records for USDCAD ...
+2026-06-20 12:59:19 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10919 candle_tracker_backtest records
+2026-06-20 12:59:19 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCHF 15m — 5531 candles
+2026-06-20 12:59:26 | INFO     | __main__:run_backtest_multi:261 - Saving 10744 tracker records for USDCHF ...
+2026-06-20 12:59:30 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10744 candle_tracker_backtest records
+2026-06-20 12:59:30 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURJPY 15m — 5531 candles
+2026-06-20 12:59:38 | INFO     | __main__:run_backtest_multi:261 - Saving 10635 tracker records for EURJPY ...
+2026-06-20 12:59:41 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10635 candle_tracker_backtest records
+2026-06-20 12:59:41 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 13:02:55 | INFO     | __main__:main:697 - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 13:02:55 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 13:02:55 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURUSD 15m — 5531 candles
+2026-06-20 13:03:01 | INFO     | __main__:run_backtest_multi:261 - Saving 10731 tracker records for EURUSD ...
+2026-06-20 13:03:05 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10731 candle_tracker_backtest records
+2026-06-20 13:03:05 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: GBPUSD 15m — 5531 candles
+2026-06-20 13:03:13 | INFO     | __main__:run_backtest_multi:261 - Saving 10174 tracker records for GBPUSD ...
+2026-06-20 13:03:17 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10174 candle_tracker_backtest records
+2026-06-20 13:03:17 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDJPY 15m — 5531 candles
+2026-06-20 13:03:24 | INFO     | __main__:run_backtest_multi:261 - Saving 9992 tracker records for USDJPY ...
+2026-06-20 13:03:28 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 9992 candle_tracker_backtest records
+2026-06-20 13:03:28 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: XAUUSD 15m — 4550 candles
+2026-06-20 13:03:31 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-302.17) — disabling trading
+2026-06-20 13:03:34 | INFO     | __main__:run_backtest_multi:261 - Saving 8751 tracker records for XAUUSD ...
+2026-06-20 13:03:37 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 8751 candle_tracker_backtest records
+2026-06-20 13:03:38 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCAD 15m — 5531 candles
+2026-06-20 13:03:44 | INFO     | __main__:run_backtest_multi:261 - Saving 10919 tracker records for USDCAD ...
+2026-06-20 13:03:48 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10919 candle_tracker_backtest records
+2026-06-20 13:03:48 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCHF 15m — 5531 candles
+2026-06-20 13:03:55 | INFO     | __main__:run_backtest_multi:261 - Saving 10744 tracker records for USDCHF ...
+2026-06-20 13:03:59 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10744 candle_tracker_backtest records
+2026-06-20 13:03:59 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURJPY 15m — 5531 candles
+2026-06-20 13:04:07 | INFO     | __main__:run_backtest_multi:261 - Saving 10635 tracker records for EURJPY ...
+2026-06-20 13:04:10 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10635 candle_tracker_backtest records
+2026-06-20 13:04:10 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 13:05:46 | INFO     | __main__:main:697 - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 13:05:46 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 13:05:46 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURUSD 15m — 5531 candles
+2026-06-20 13:05:52 | INFO     | __main__:run_backtest_multi:261 - Saving 10731 tracker records for EURUSD ...
+2026-06-20 13:05:56 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10731 candle_tracker_backtest records
+2026-06-20 13:05:56 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: GBPUSD 15m — 5531 candles
+2026-06-20 13:06:03 | INFO     | __main__:run_backtest_multi:261 - Saving 10174 tracker records for GBPUSD ...
+2026-06-20 13:06:06 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10174 candle_tracker_backtest records
+2026-06-20 13:06:06 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDJPY 15m — 5531 candles
+2026-06-20 13:06:14 | INFO     | __main__:run_backtest_multi:261 - Saving 9992 tracker records for USDJPY ...
+2026-06-20 13:06:17 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 9992 candle_tracker_backtest records
+2026-06-20 13:06:17 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: XAUUSD 15m — 4550 candles
+2026-06-20 13:06:20 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-302.17) — disabling trading
+2026-06-20 13:06:23 | INFO     | __main__:run_backtest_multi:261 - Saving 8751 tracker records for XAUUSD ...
+2026-06-20 13:06:26 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 8751 candle_tracker_backtest records
+2026-06-20 13:06:26 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCAD 15m — 5531 candles
+2026-06-20 13:06:33 | INFO     | __main__:run_backtest_multi:261 - Saving 10919 tracker records for USDCAD ...
+2026-06-20 13:06:37 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10919 candle_tracker_backtest records
+2026-06-20 13:06:37 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCHF 15m — 5531 candles
+2026-06-20 13:06:44 | INFO     | __main__:run_backtest_multi:261 - Saving 10744 tracker records for USDCHF ...
+2026-06-20 13:06:47 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10744 candle_tracker_backtest records
+2026-06-20 13:06:47 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURJPY 15m — 5531 candles
+2026-06-20 13:06:54 | INFO     | __main__:run_backtest_multi:261 - Saving 10635 tracker records for EURJPY ...
+2026-06-20 13:06:58 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10635 candle_tracker_backtest records
+2026-06-20 13:06:58 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 13:08:22 | INFO     | __main__:main:697 - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 13:08:22 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 13:08:22 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURUSD 15m — 5531 candles
+2026-06-20 13:08:28 | INFO     | __main__:run_backtest_multi:261 - Saving 10733 tracker records for EURUSD ...
+2026-06-20 13:08:32 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10733 candle_tracker_backtest records
+2026-06-20 13:08:32 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: GBPUSD 15m — 5531 candles
+2026-06-20 13:08:39 | INFO     | __main__:run_backtest_multi:261 - Saving 10364 tracker records for GBPUSD ...
+2026-06-20 13:08:43 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10364 candle_tracker_backtest records
+2026-06-20 13:08:43 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDJPY 15m — 5531 candles
+2026-06-20 13:08:51 | INFO     | __main__:run_backtest_multi:261 - Saving 10215 tracker records for USDJPY ...
+2026-06-20 13:08:54 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10215 candle_tracker_backtest records
+2026-06-20 13:08:54 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: XAUUSD 15m — 4550 candles
+2026-06-20 13:08:57 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-302.17) — disabling trading
+2026-06-20 13:09:00 | INFO     | __main__:run_backtest_multi:261 - Saving 8759 tracker records for XAUUSD ...
+2026-06-20 13:09:03 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 8759 candle_tracker_backtest records
+2026-06-20 13:09:04 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCAD 15m — 5531 candles
+2026-06-20 13:09:10 | INFO     | __main__:run_backtest_multi:261 - Saving 10932 tracker records for USDCAD ...
+2026-06-20 13:09:14 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10932 candle_tracker_backtest records
+2026-06-20 13:09:14 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCHF 15m — 5531 candles
+2026-06-20 13:09:21 | INFO     | __main__:run_backtest_multi:261 - Saving 10881 tracker records for USDCHF ...
+2026-06-20 13:09:25 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10881 candle_tracker_backtest records
+2026-06-20 13:09:25 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURJPY 15m — 5531 candles
+2026-06-20 13:09:32 | INFO     | __main__:run_backtest_multi:261 - Saving 10646 tracker records for EURJPY ...
+2026-06-20 13:09:36 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 10646 candle_tracker_backtest records
+2026-06-20 13:09:36 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 13:10:19 | INFO     | __main__:main:697 - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 13:10:19 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 13:10:19 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURUSD 1h — 12205 candles
+2026-06-20 13:10:20 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-395.99) — disabling trading
+2026-06-20 13:10:25 | INFO     | __main__:run_backtest_multi:261 - Saving 23329 tracker records for EURUSD ...
+2026-06-20 13:10:33 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23329 candle_tracker_backtest records
+2026-06-20 13:10:33 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: GBPUSD 1h — 12206 candles
+2026-06-20 13:10:39 | INFO     | __main__:run_backtest_multi:261 - Saving 23283 tracker records for GBPUSD ...
+2026-06-20 13:10:47 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23283 candle_tracker_backtest records
+2026-06-20 13:10:47 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDJPY 1h — 12191 candles
+2026-06-20 13:10:53 | INFO     | __main__:run_backtest_multi:261 - Saving 23922 tracker records for USDJPY ...
+2026-06-20 13:11:02 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23922 candle_tracker_backtest records
+2026-06-20 13:11:02 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: XAUUSD 1h — 11423 candles
+2026-06-20 13:11:08 | INFO     | __main__:run_backtest_multi:261 - Saving 22333 tracker records for XAUUSD ...
+2026-06-20 13:11:16 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 22333 candle_tracker_backtest records
+2026-06-20 13:11:16 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCAD 1h — 12263 candles
+2026-06-20 13:11:22 | INFO     | __main__:run_backtest_multi:261 - Saving 24016 tracker records for USDCAD ...
+2026-06-20 13:11:30 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 24016 candle_tracker_backtest records
+2026-06-20 13:11:30 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCHF 1h — 12210 candles
+2026-06-20 13:11:37 | INFO     | __main__:run_backtest_multi:261 - Saving 23832 tracker records for USDCHF ...
+2026-06-20 13:11:45 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23832 candle_tracker_backtest records
+2026-06-20 13:11:45 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURJPY 1h — 12214 candles
+2026-06-20 13:11:52 | INFO     | __main__:run_backtest_multi:261 - Saving 23809 tracker records for EURJPY ...
+2026-06-20 13:12:00 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23809 candle_tracker_backtest records
+2026-06-20 13:12:00 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 13:12:57 | INFO     | __main__:main:697 - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 13:12:57 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 13:12:57 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURUSD 1h — 12205 candles
+2026-06-20 13:12:58 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-395.99) — disabling trading
+2026-06-20 13:13:03 | INFO     | __main__:run_backtest_multi:261 - Saving 23329 tracker records for EURUSD ...
+2026-06-20 13:13:11 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23329 candle_tracker_backtest records
+2026-06-20 13:13:11 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: GBPUSD 1h — 12206 candles
+2026-06-20 13:13:18 | INFO     | __main__:run_backtest_multi:261 - Saving 23283 tracker records for GBPUSD ...
+2026-06-20 13:13:26 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23283 candle_tracker_backtest records
+2026-06-20 13:13:26 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDJPY 1h — 12191 candles
+2026-06-20 13:13:30 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 15.3% hit — disabling trading
+2026-06-20 13:13:32 | INFO     | __main__:run_backtest_multi:261 - Saving 14374 tracker records for USDJPY ...
+2026-06-20 13:13:37 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 14374 candle_tracker_backtest records
+2026-06-20 13:13:37 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: XAUUSD 1h — 11423 candles
+2026-06-20 13:13:43 | INFO     | __main__:run_backtest_multi:261 - Saving 22333 tracker records for XAUUSD ...
+2026-06-20 13:13:50 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 22333 candle_tracker_backtest records
+2026-06-20 13:13:50 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCAD 1h — 12263 candles
+2026-06-20 13:13:57 | INFO     | __main__:run_backtest_multi:261 - Saving 24016 tracker records for USDCAD ...
+2026-06-20 13:14:05 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 24016 candle_tracker_backtest records
+2026-06-20 13:14:05 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCHF 1h — 12210 candles
+2026-06-20 13:14:12 | INFO     | __main__:run_backtest_multi:261 - Saving 23832 tracker records for USDCHF ...
+2026-06-20 13:14:21 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23832 candle_tracker_backtest records
+2026-06-20 13:14:21 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURJPY 1h — 12214 candles
+2026-06-20 13:14:27 | INFO     | __main__:run_backtest_multi:261 - Saving 23809 tracker records for EURJPY ...
+2026-06-20 13:14:35 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23809 candle_tracker_backtest records
+2026-06-20 13:14:35 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 13:20:56 | INFO     | __main__:main:702 - MT5 Scalper | mode=download | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 13:20:56 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:connect:61 - TwelveDataDownloader ready (key=...67f997)
+2026-06-20 13:20:56 | INFO     | __main__:run_download:81 - Full download: EURUSD 15m (insufficient history in DB)
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading EURUSD (EUR/USD) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=EUR/USD&interval=15min&start_date=2024-06-20 09:20:56&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho EURUSD 15m
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for EURUSD 15m
+2026-06-20 13:20:56 | INFO     | __main__:run_download:83 - Incremental update: EURUSD 1h from 2026-06-19
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading EURUSD (EUR/USD) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=EUR/USD&interval=1h&start_date=2026-06-19 20:00:00&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho EURUSD 1h
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for EURUSD 1h
+2026-06-20 13:20:56 | INFO     | __main__:run_download:81 - Full download: GBPUSD 15m (insufficient history in DB)
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading GBPUSD (GBP/USD) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=GBP/USD&interval=15min&start_date=2024-06-20 09:20:56&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho GBPUSD 15m
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for GBPUSD 15m
+2026-06-20 13:20:56 | INFO     | __main__:run_download:83 - Incremental update: GBPUSD 1h from 2026-06-19
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading GBPUSD (GBP/USD) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=GBP/USD&interval=1h&start_date=2026-06-19 20:00:00&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho GBPUSD 1h
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for GBPUSD 1h
+2026-06-20 13:20:56 | INFO     | __main__:run_download:81 - Full download: USDJPY 15m (insufficient history in DB)
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading USDJPY (USD/JPY) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=USD/JPY&interval=15min&start_date=2024-06-20 09:20:56&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho USDJPY 15m
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for USDJPY 15m
+2026-06-20 13:20:56 | INFO     | __main__:run_download:83 - Incremental update: USDJPY 1h from 2026-06-19
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading USDJPY (USD/JPY) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=USD/JPY&interval=1h&start_date=2026-06-19 20:00:00&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho USDJPY 1h
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for USDJPY 1h
+2026-06-20 13:20:56 | INFO     | __main__:run_download:81 - Full download: XAUUSD 15m (insufficient history in DB)
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading XAUUSD (XAU/USD) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=XAU/USD&interval=15min&start_date=2024-06-20 09:20:56&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho XAUUSD 15m
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for XAUUSD 15m
+2026-06-20 13:20:56 | INFO     | __main__:run_download:83 - Incremental update: XAUUSD 1h from 2026-06-19
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading XAUUSD (XAU/USD) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=XAU/USD&interval=1h&start_date=2026-06-19 03:00:00&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho XAUUSD 1h
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for XAUUSD 1h
+2026-06-20 13:20:56 | INFO     | __main__:run_download:81 - Full download: USDCAD 15m (insufficient history in DB)
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading USDCAD (USD/CAD) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=USD/CAD&interval=15min&start_date=2024-06-20 09:20:56&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho USDCAD 15m
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for USDCAD 15m
+2026-06-20 13:20:56 | INFO     | __main__:run_download:83 - Incremental update: USDCAD 1h from 2026-06-19
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading USDCAD (USD/CAD) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=USD/CAD&interval=1h&start_date=2026-06-19 20:00:00&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho USDCAD 1h
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for USDCAD 1h
+2026-06-20 13:20:56 | INFO     | __main__:run_download:81 - Full download: USDCHF 15m (insufficient history in DB)
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading USDCHF (USD/CHF) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=USD/CHF&interval=15min&start_date=2024-06-20 09:20:56&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho USDCHF 15m
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for USDCHF 15m
+2026-06-20 13:20:56 | INFO     | __main__:run_download:83 - Incremental update: USDCHF 1h from 2026-06-19
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading USDCHF (USD/CHF) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=USD/CHF&interval=1h&start_date=2026-06-19 20:00:00&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho USDCHF 1h
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for USDCHF 1h
+2026-06-20 13:20:56 | INFO     | __main__:run_download:81 - Full download: EURJPY 15m (insufficient history in DB)
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading EURJPY (EUR/JPY) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=EUR/JPY&interval=15min&start_date=2024-06-20 09:20:56&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho EURJPY 15m
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for EURJPY 15m
+2026-06-20 13:20:56 | INFO     | __main__:run_download:83 - Incremental update: EURJPY 1h from 2026-06-19
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:89 - Twelve Data downloading EURJPY (EUR/JPY) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:20:56 | ERROR    | phase1_data.twelvedata_downloader:_download_sync:114 - Twelve Data request error: URL can't contain control characters. '/time_series?symbol=EUR/JPY&interval=1h&start_date=2026-06-19 20:00:00&end_date=2026-06-20 09:20:56&outputsize=5000&order=ASC&timezone=UTC&apikey=38fa693f4a334295bb2020f04b67f997' (found at least ' ')
+2026-06-20 13:20:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:176 - Twelve Data: 0 candles cho EURJPY 1h
+2026-06-20 13:20:56 | WARNING  | __main__:run_download:90 - No data returned for EURJPY 1h
+2026-06-20 13:20:56 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 13:20:56 | INFO     | __main__:run_download:94 - Download complete
+2026-06-20 13:21:31 | INFO     | __main__:main:702 - MT5 Scalper | mode=download | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 13:21:32 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 13:21:32 | INFO     | phase1_data.twelvedata_downloader:connect:61 - TwelveDataDownloader ready (key=...67f997)
+2026-06-20 13:21:32 | INFO     | __main__:run_download:81 - Full download: EURUSD 15m (insufficient history in DB)
+2026-06-20 13:21:32 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading EURUSD (EUR/USD) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:21:33 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 5000 candles (2026-04-29 → 2026-06-20)
+2026-06-20 13:21:42 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 2: 5000 candles (2026-03-08 → 2026-04-29)
+2026-06-20 13:21:51 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 3: 5000 candles (2026-01-14 → 2026-03-08)
+2026-06-20 13:22:00 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 4: 5000 candles (2025-11-03 → 2026-01-14)
+2026-06-20 13:22:10 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 5: 5000 candles (2025-08-20 → 2025-11-03)
+2026-06-20 13:22:19 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 6: 5000 candles (2025-06-06 → 2025-08-20)
+2026-06-20 13:22:29 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 7: 5000 candles (2025-03-25 → 2025-06-06)
+2026-06-20 13:22:38 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 8: 5000 candles (2025-01-09 → 2025-03-25)
+2026-06-20 13:22:48 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 9: 5000 candles (2024-10-24 → 2025-01-09)
+2026-06-20 13:22:57 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 10: 5000 candles (2024-08-12 → 2024-10-24)
+2026-06-20 13:23:06 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 11: 3512 candles (2024-06-20 → 2024-08-12)
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-07-18 13:30:00+00:00: ['low(1.09124) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-07-22 17:00:00+00:00: ['low(1.08862) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-07-30 10:15:00+00:00: ['low(1.08318) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-08-01 02:00:00+00:00: ['high(1.08284) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-08-06 06:30:00+00:00: ['high(1.09476) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-08-06 08:15:00+00:00: ['high(1.09319) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-08-06 16:45:00+00:00: ['high(1.09297) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-08-08 17:15:00+00:00: ['low(1.09119) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-08-13 02:00:00+00:00: ['low(1.09343) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-08-13 02:45:00+00:00: ['high(1.09366) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-08-13 15:30:00+00:00: ['low(1.09478) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-08-19 17:45:00+00:00: ['low(1.10738) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-08-22 08:45:00+00:00: ['high(1.11489) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-08-26 09:45:00+00:00: ['high(1.11829) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-08-29 16:00:00+00:00: ['high(1.10864) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-09-03 18:45:00+00:00: ['low(1.10335) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-09-09 12:30:00+00:00: ['high(1.10493) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-09-26 20:30:00+00:00: ['low(1.11743) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-09-30 06:45:00+00:00: ['low(1.11631) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-09-30 21:30:00+00:00: ['high(1.11383) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-01 18:00:00+00:00: ['low(1.10622) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-07 23:45:00+00:00: ['high(1.09768) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-10 14:15:00+00:00: ['low(1.09221) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-10 21:15:00+00:00: ['low(1.09304) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-11 15:15:00+00:00: ['low(1.0947) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-11 16:45:00+00:00: ['high(1.09465) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-14 16:30:00+00:00: ['low(1.09011) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-15 00:45:00+00:00: ['high(1.09082) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-15 11:30:00+00:00: ['low(1.08991) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-17 05:45:00+00:00: ['high(1.08549) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-18 16:30:00+00:00: ['high(1.08669) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-23 05:30:00+00:00: ['high(1.08064) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-25 10:45:00+00:00: ['high(1.08267) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-10-28 12:15:00+00:00: ['high(1.08267) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-11-08 09:00:00+00:00: ['high(1.07889) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-11-11 17:30:00+00:00: ['low(1.06475) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-11-13 03:30:00+00:00: ['low(1.06192) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-11-13 12:30:00+00:00: ['high(1.06339) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-11-19 05:15:00+00:00: ['low(1.05838) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-11-27 15:30:00+00:00: ['low(1.05411) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-11-28 11:45:00+00:00: ['low(1.05452) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-11-28 12:00:00+00:00: ['high(1.05513) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-12-03 04:30:00+00:00: ['high(1.04878) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-12-03 10:45:00+00:00: ['high(1.05258) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-12-05 18:00:00+00:00: ['low(1.0564) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-12-05 19:00:00+00:00: ['low(1.05681) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-12-18 13:00:00+00:00: ['high(1.0499) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-12-23 22:00:00+00:00: ['low(1.04019) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2024-12-24 05:15:00+00:00: ['high(1.03968) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-01-02 21:00:00+00:00: ['low(1.02611) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-01-03 02:15:00+00:00: ['high(1.02719) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-01-03 11:45:00+00:00: ['low(1.02971) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-01-08 07:30:00+00:00: ['high(1.03449) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-01-09 06:15:00+00:00: ['low(1.02992) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-01-10 04:45:00+00:00: ['high(1.02969) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-01-10 05:15:00+00:00: ['high(1.0298) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-01-13 11:15:00+00:00: ['high(1.01961) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-01-14 15:45:00+00:00: ['high(1.02961) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-01-15 04:45:00+00:00: ['high(1.03029) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-02-03 20:45:00+00:00: ['high(1.02995) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-02-11 03:30:00+00:00: ['high(1.03008) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-02-13 04:45:00+00:00: ['low(1.04303) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-02-13 05:00:00+00:00: ['low(1.0433) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-02-13 22:00:00+00:00: ['low(1.04616) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-02-14 04:45:00+00:00: ['high(1.04577) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-02-17 19:15:00+00:00: ['low(1.04821) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-02-18 05:30:00+00:00: ['high(1.04565) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-02-18 08:45:00+00:00: ['high(1.04668) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-02-20 18:00:00+00:00: ['high(1.0496) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-02-21 09:45:00+00:00: ['high(1.04738) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-02-28 10:15:00+00:00: ['high(1.03964) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-03-11 20:00:00+00:00: ['low(1.09142) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-03-14 12:00:00+00:00: ['high(1.09096) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-03-17 13:45:00+00:00: ['high(1.09068) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-03-19 16:30:00+00:00: ['high(1.08862) < open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-03-26 18:30:00+00:00: ['low(1.0753) > open/close']
+2026-06-20 13:23:06 | WARNING  | phase1_data.validator:validate_candle:85 - [EURUSD 15m] invalid candle 2025-03-26 19:15:00+00:00: ['high(1.07518) < open/close']
+2026-06-20 13:23:06 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 48859 candles cho EURUSD 15m
+2026-06-20 13:23:07 | INFO     | __main__:run_download:88 - Saved 48859 candles for EURUSD 15m
+2026-06-20 13:23:07 | INFO     | __main__:run_download:83 - Incremental update: EURUSD 1h from 2026-06-19
+2026-06-20 13:23:07 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading EURUSD (EUR/USD) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:23:07 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 14 candles (2026-06-19 → 2026-06-20)
+2026-06-20 13:23:07 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 0 candles cho EURUSD 1h
+2026-06-20 13:23:07 | WARNING  | __main__:run_download:90 - No data returned for EURUSD 1h
+2026-06-20 13:23:07 | INFO     | __main__:run_download:81 - Full download: GBPUSD 15m (insufficient history in DB)
+2026-06-20 13:23:07 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading GBPUSD (GBP/USD) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:23:09 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 5000 candles (2026-04-29 → 2026-06-20)
+2026-06-20 13:23:18 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 2: 5000 candles (2026-03-08 → 2026-04-29)
+2026-06-20 13:23:28 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 3: 5000 candles (2026-01-14 → 2026-03-08)
+2026-06-20 13:23:37 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 4: 5000 candles (2025-10-31 → 2026-01-14)
+2026-06-20 13:23:46 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 5: 5000 candles (2025-08-20 → 2025-10-31)
+2026-06-20 13:23:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 6: 5000 candles (2025-06-08 → 2025-08-20)
+2026-06-20 13:24:05 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 7: 5000 candles (2025-03-26 → 2025-06-08)
+2026-06-20 13:24:15 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 8: 5000 candles (2025-01-13 → 2025-03-26)
+2026-06-20 13:24:24 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 9: 5000 candles (2024-10-28 → 2025-01-13)
+2026-06-20 13:24:34 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 10: 5000 candles (2024-08-14 → 2024-10-28)
+2026-06-20 13:24:43 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 11: 3699 candles (2024-06-20 → 2024-08-14)
+2026-06-20 13:24:43 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 49095 candles cho GBPUSD 15m
+2026-06-20 13:24:44 | INFO     | __main__:run_download:88 - Saved 49095 candles for GBPUSD 15m
+2026-06-20 13:24:44 | INFO     | __main__:run_download:83 - Incremental update: GBPUSD 1h from 2026-06-19
+2026-06-20 13:24:44 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading GBPUSD (GBP/USD) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:24:44 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 14 candles (2026-06-19 → 2026-06-20)
+2026-06-20 13:24:44 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 0 candles cho GBPUSD 1h
+2026-06-20 13:24:44 | WARNING  | __main__:run_download:90 - No data returned for GBPUSD 1h
+2026-06-20 13:24:44 | INFO     | __main__:run_download:81 - Full download: USDJPY 15m (insufficient history in DB)
+2026-06-20 13:24:44 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading USDJPY (USD/JPY) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:24:45 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 5000 candles (2026-04-29 → 2026-06-20)
+2026-06-20 13:24:54 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 2: 5000 candles (2026-03-08 → 2026-04-29)
+2026-06-20 13:25:03 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 3: 5000 candles (2026-01-14 → 2026-03-08)
+2026-06-20 13:25:12 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 4: 5000 candles (2025-10-31 → 2026-01-14)
+2026-06-20 13:25:22 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 5: 5000 candles (2025-08-19 → 2025-10-31)
+2026-06-20 13:25:31 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 6: 5000 candles (2025-06-05 → 2025-08-19)
+2026-06-20 13:25:40 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 7: 5000 candles (2025-03-24 → 2025-06-05)
+2026-06-20 13:25:50 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 8: 5000 candles (2025-01-09 → 2025-03-24)
+2026-06-20 13:25:59 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 9: 5000 candles (2024-10-24 → 2025-01-09)
+2026-06-20 13:26:09 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 10: 5000 candles (2024-08-13 → 2024-10-24)
+2026-06-20 13:26:18 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 11: 3554 candles (2024-06-20 → 2024-08-13)
+2026-06-20 13:26:18 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 49063 candles cho USDJPY 15m
+2026-06-20 13:26:19 | INFO     | __main__:run_download:88 - Saved 49063 candles for USDJPY 15m
+2026-06-20 13:26:19 | INFO     | __main__:run_download:83 - Incremental update: USDJPY 1h from 2026-06-19
+2026-06-20 13:26:19 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading USDJPY (USD/JPY) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:26:19 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 14 candles (2026-06-19 → 2026-06-20)
+2026-06-20 13:26:19 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 0 candles cho USDJPY 1h
+2026-06-20 13:26:19 | WARNING  | __main__:run_download:90 - No data returned for USDJPY 1h
+2026-06-20 13:26:19 | INFO     | __main__:run_download:81 - Full download: XAUUSD 15m (insufficient history in DB)
+2026-06-20 13:26:19 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading XAUUSD (XAU/USD) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:26:20 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 5000 candles (2026-04-29 → 2026-06-20)
+2026-06-20 13:26:29 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 2: 5000 candles (2026-03-08 → 2026-04-29)
+2026-06-20 13:26:38 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 3: 5000 candles (2026-01-15 → 2026-03-08)
+2026-06-20 13:26:47 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 4: 5000 candles (2025-11-17 → 2026-01-15)
+2026-06-20 13:26:56 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 5: 5000 candles (2025-09-12 → 2025-11-17)
+2026-06-20 13:27:05 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 6: 5000 candles (2025-07-11 → 2025-09-12)
+2026-06-20 13:27:14 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 7: 5000 candles (2025-05-08 → 2025-07-11)
+2026-06-20 13:27:23 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 8: 5000 candles (2025-02-20 → 2025-05-08)
+2026-06-20 13:27:32 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 9: 5000 candles (2024-12-03 → 2025-02-20)
+2026-06-20 13:27:41 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 10: 5000 candles (2024-09-17 → 2024-12-03)
+2026-06-20 13:27:50 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 11: 5000 candles (2024-07-03 → 2024-09-17)
+2026-06-20 13:27:59 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 12: 814 candles (2024-06-20 → 2024-07-03)
+2026-06-20 13:27:59 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 48403 candles cho XAUUSD 15m
+2026-06-20 13:28:00 | INFO     | __main__:run_download:88 - Saved 48403 candles for XAUUSD 15m
+2026-06-20 13:28:00 | INFO     | __main__:run_download:83 - Incremental update: XAUUSD 1h from 2026-06-19
+2026-06-20 13:28:00 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading XAUUSD (XAU/USD) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:28:00 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 31 candles (2026-06-19 → 2026-06-20)
+2026-06-20 13:28:00 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 17 candles cho XAUUSD 1h
+2026-06-20 13:28:00 | INFO     | __main__:run_download:88 - Saved 17 candles for XAUUSD 1h
+2026-06-20 13:28:00 | INFO     | __main__:run_download:81 - Full download: USDCAD 15m (insufficient history in DB)
+2026-06-20 13:28:00 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading USDCAD (USD/CAD) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:28:01 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 5000 candles (2026-04-29 → 2026-06-20)
+2026-06-20 13:28:10 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 2: 5000 candles (2026-03-08 → 2026-04-29)
+2026-06-20 13:28:19 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 3: 5000 candles (2026-01-14 → 2026-03-08)
+2026-06-20 13:28:28 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 4: 5000 candles (2025-10-31 → 2026-01-14)
+2026-06-20 13:28:36 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 5: 5000 candles (2025-08-19 → 2025-10-31)
+2026-06-20 13:28:46 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 6: 5000 candles (2025-06-05 → 2025-08-19)
+2026-06-20 13:28:55 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 7: 5000 candles (2025-03-25 → 2025-06-05)
+2026-06-20 13:29:05 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 8: 5000 candles (2025-01-10 → 2025-03-25)
+2026-06-20 13:29:14 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 9: 5000 candles (2024-10-25 → 2025-01-10)
+2026-06-20 13:29:24 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 10: 5000 candles (2024-08-13 → 2024-10-25)
+2026-06-20 13:29:33 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 11: 3611 candles (2024-06-20 → 2024-08-13)
+2026-06-20 13:29:33 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 49089 candles cho USDCAD 15m
+2026-06-20 13:29:34 | INFO     | __main__:run_download:88 - Saved 49089 candles for USDCAD 15m
+2026-06-20 13:29:34 | INFO     | __main__:run_download:83 - Incremental update: USDCAD 1h from 2026-06-19
+2026-06-20 13:29:34 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading USDCAD (USD/CAD) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:29:34 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 14 candles (2026-06-19 → 2026-06-20)
+2026-06-20 13:29:34 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 0 candles cho USDCAD 1h
+2026-06-20 13:29:34 | WARNING  | __main__:run_download:90 - No data returned for USDCAD 1h
+2026-06-20 13:29:34 | INFO     | __main__:run_download:81 - Full download: USDCHF 15m (insufficient history in DB)
+2026-06-20 13:29:34 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading USDCHF (USD/CHF) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:29:36 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 5000 candles (2026-04-29 → 2026-06-20)
+2026-06-20 13:29:45 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 2: 5000 candles (2026-03-08 → 2026-04-29)
+2026-06-20 13:29:54 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 3: 5000 candles (2026-01-14 → 2026-03-08)
+2026-06-20 13:30:05 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 4: 5000 candles (2025-10-31 → 2026-01-14)
+2026-06-20 13:30:15 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 5: 5000 candles (2025-08-19 → 2025-10-31)
+2026-06-20 13:30:25 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 6: 5000 candles (2025-06-05 → 2025-08-19)
+2026-06-20 13:30:34 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 7: 5000 candles (2025-03-24 → 2025-06-05)
+2026-06-20 13:30:44 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 8: 5000 candles (2025-01-09 → 2025-03-24)
+2026-06-20 13:30:54 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 9: 5000 candles (2024-10-25 → 2025-01-09)
+2026-06-20 13:31:04 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 10: 5000 candles (2024-08-13 → 2024-10-25)
+2026-06-20 13:31:13 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 11: 3569 candles (2024-06-20 → 2024-08-13)
+2026-06-20 13:31:13 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 49074 candles cho USDCHF 15m
+2026-06-20 13:31:14 | INFO     | __main__:run_download:88 - Saved 49074 candles for USDCHF 15m
+2026-06-20 13:31:14 | INFO     | __main__:run_download:83 - Incremental update: USDCHF 1h from 2026-06-19
+2026-06-20 13:31:14 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading USDCHF (USD/CHF) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:31:14 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 14 candles (2026-06-19 → 2026-06-20)
+2026-06-20 13:31:14 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 0 candles cho USDCHF 1h
+2026-06-20 13:31:14 | WARNING  | __main__:run_download:90 - No data returned for USDCHF 1h
+2026-06-20 13:31:14 | INFO     | __main__:run_download:81 - Full download: EURJPY 15m (insufficient history in DB)
+2026-06-20 13:31:14 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading EURJPY (EUR/JPY) 15m từ 2024-06-20 → 2026-06-20 ...
+2026-06-20 13:31:15 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 5000 candles (2026-04-29 → 2026-06-20)
+2026-06-20 13:31:24 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 2: 5000 candles (2026-03-08 → 2026-04-29)
+2026-06-20 13:31:34 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 3: 5000 candles (2026-01-14 → 2026-03-08)
+2026-06-20 13:31:43 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 4: 5000 candles (2025-10-31 → 2026-01-14)
+2026-06-20 13:31:52 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 5: 5000 candles (2025-08-19 → 2025-10-31)
+2026-06-20 13:32:03 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 6: 5000 candles (2025-06-06 → 2025-08-19)
+2026-06-20 13:32:12 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 7: 5000 candles (2025-03-25 → 2025-06-06)
+2026-06-20 13:32:21 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 8: 5000 candles (2025-01-10 → 2025-03-25)
+2026-06-20 13:32:30 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 9: 5000 candles (2024-10-25 → 2025-01-10)
+2026-06-20 13:32:39 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 10: 5000 candles (2024-08-13 → 2024-10-25)
+2026-06-20 13:32:48 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 11: 3610 candles (2024-06-20 → 2024-08-13)
+2026-06-20 13:32:48 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 49068 candles cho EURJPY 15m
+2026-06-20 13:32:49 | INFO     | __main__:run_download:88 - Saved 49068 candles for EURJPY 15m
+2026-06-20 13:32:49 | INFO     | __main__:run_download:83 - Incremental update: EURJPY 1h from 2026-06-19
+2026-06-20 13:32:49 | INFO     | phase1_data.twelvedata_downloader:_download_sync:90 - Twelve Data downloading EURJPY (EUR/JPY) 1h từ 2026-06-19 → 2026-06-20 ...
+2026-06-20 13:32:49 | INFO     | phase1_data.twelvedata_downloader:_download_sync:147 -   Page 1: 14 candles (2026-06-19 → 2026-06-20)
+2026-06-20 13:32:49 | INFO     | phase1_data.twelvedata_downloader:_download_sync:177 - Twelve Data: 0 candles cho EURJPY 1h
+2026-06-20 13:32:49 | WARNING  | __main__:run_download:90 - No data returned for EURJPY 1h
+2026-06-20 13:32:49 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 13:32:49 | INFO     | __main__:run_download:94 - Download complete
+2026-06-20 13:33:59 | INFO     | __main__:main:704 - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 13:34:00 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 13:34:00 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURUSD 15m — 48859 candles
+2026-06-20 13:34:50 | INFO     | __main__:run_backtest_multi:268 - Saving 94773 tracker records for EURUSD ...
+2026-06-20 13:35:20 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 94773 candle_tracker_backtest records
+2026-06-20 13:35:20 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: GBPUSD 15m — 49095 candles
+2026-06-20 13:35:35 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-680.25) — disabling trading
+2026-06-20 13:35:50 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-840.55) — disabling trading
+2026-06-20 13:35:52 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 16.9% hit — disabling trading
+2026-06-20 13:36:03 | INFO     | __main__:run_backtest_multi:268 - Saving 60905 tracker records for GBPUSD ...
+2026-06-20 13:36:23 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 60905 candle_tracker_backtest records
+2026-06-20 13:36:23 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDJPY 15m — 49063 candles
+2026-06-20 13:36:26 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-432.56) — disabling trading
+2026-06-20 13:36:28 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-546.87) — disabling trading
+2026-06-20 13:36:32 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 16.0% hit — disabling trading
+2026-06-20 13:36:57 | INFO     | __main__:run_backtest_multi:268 - Saving 17521 tracker records for USDJPY ...
+2026-06-20 13:37:03 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 17521 candle_tracker_backtest records
+2026-06-20 13:37:03 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: XAUUSD 15m — 48403 candles
+2026-06-20 13:37:15 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-328.80) — disabling trading
+2026-06-20 13:37:50 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-398.30) — disabling trading
+2026-06-20 13:37:50 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 17.5% hit — disabling trading
+2026-06-20 13:37:52 | INFO     | __main__:run_backtest_multi:268 - Saving 88142 tracker records for XAUUSD ...
+2026-06-20 13:38:20 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 88142 candle_tracker_backtest records
+2026-06-20 13:38:21 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCAD 15m — 49089 candles
+2026-06-20 13:39:09 | INFO     | __main__:run_backtest_multi:268 - Saving 93806 tracker records for USDCAD ...
+2026-06-20 13:39:39 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 93806 candle_tracker_backtest records
+2026-06-20 13:39:40 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCHF 15m — 49074 candles
+2026-06-20 13:39:46 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 15.1% hit — disabling trading
+2026-06-20 13:40:11 | INFO     | __main__:run_backtest_multi:268 - Saving 12615 tracker records for USDCHF ...
+2026-06-20 13:40:16 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 12615 candle_tracker_backtest records
+2026-06-20 13:40:16 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURJPY 15m — 49068 candles
+2026-06-20 13:40:54 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-644.35) — disabling trading
+2026-06-20 13:41:07 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 16.8% hit — disabling trading
+2026-06-20 13:41:09 | INFO     | __main__:run_backtest_multi:268 - Saving 94438 tracker records for EURJPY ...
+2026-06-20 13:41:41 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 94438 candle_tracker_backtest records
+2026-06-20 13:41:41 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 13:55:24 | INFO     | __main__:main:704 - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 13:55:24 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 13:55:24 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURUSD 15m — 48859 candles
+2026-06-20 13:56:16 | INFO     | __main__:run_backtest_multi:268 - Saving 94773 tracker records for EURUSD ...
+2026-06-20 13:56:50 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 94773 candle_tracker_backtest records
+2026-06-20 13:56:50 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: GBPUSD 15m — 49095 candles
+2026-06-20 13:57:05 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-680.25) — disabling trading
+2026-06-20 13:57:21 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-840.55) — disabling trading
+2026-06-20 13:57:22 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 16.9% hit — disabling trading
+2026-06-20 13:57:34 | INFO     | __main__:run_backtest_multi:268 - Saving 60905 tracker records for GBPUSD ...
+2026-06-20 13:57:56 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 60905 candle_tracker_backtest records
+2026-06-20 13:57:57 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDJPY 15m — 49063 candles
+2026-06-20 13:57:59 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-432.56) — disabling trading
+2026-06-20 13:58:02 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-546.87) — disabling trading
+2026-06-20 13:58:06 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 16.0% hit — disabling trading
+2026-06-20 13:58:32 | INFO     | __main__:run_backtest_multi:268 - Saving 17521 tracker records for USDJPY ...
+2026-06-20 13:58:38 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 17521 candle_tracker_backtest records
+2026-06-20 13:58:38 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: XAUUSD 15m — 48403 candles
+2026-06-20 13:58:50 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-305.78) — disabling trading
+2026-06-20 13:58:51 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 15.1% hit — disabling trading
+2026-06-20 13:59:14 | INFO     | __main__:run_backtest_multi:268 - Saving 23566 tracker records for XAUUSD ...
+2026-06-20 13:59:22 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 23566 candle_tracker_backtest records
+2026-06-20 13:59:22 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: USDCAD 15m — 49089 candles
+2026-06-20 14:00:11 | INFO     | __main__:run_backtest_multi:268 - Saving 95193 tracker records for USDCAD ...
+2026-06-20 14:00:43 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 95193 candle_tracker_backtest records
+2026-06-20 14:00:43 | WARNING  | __main__:run_backtest_multi:259 - Insufficient data for AUDUSD, skipping
+2026-06-20 14:00:43 | INFO     | phase7_backtest.backtest_engine:run:183 - Backtest started: EURJPY 15m — 49068 candles
+2026-06-20 14:01:22 | WARNING  | phase6_risk.risk_engine:register_pnl:340 - Daily loss limit hit (-644.35) — disabling trading
+2026-06-20 14:01:35 | WARNING  | phase6_risk.risk_engine:register_pnl:345 - Max drawdown 16.8% hit — disabling trading
+2026-06-20 14:01:36 | INFO     | __main__:run_backtest_multi:268 - Saving 94438 tracker records for EURJPY ...
+2026-06-20 14:02:06 | INFO     | phase1_data.database:bulk_save_candle_tracker:485 - Saved 94438 candle_tracker_backtest records
+2026-06-20 14:02:06 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 14:24:05 | INFO     | __main__:connect:70 - DukascopyDownloader ready (no API key needed)
+2026-06-20 14:24:05 | INFO     | __main__:_download_sync:101 - Dukascopy downloading EURUSD (EURUSD) 15m từ 2025-06-20 → 2026-06-20 ...
+2026-06-20 14:24:06 | INFO     | __main__:_download_sync:145 -   Page 1: no more data
+2026-06-20 14:27:40 | INFO     | __main__:connect:81 - DukascopyDownloader ready (bi5 feed, no API key needed)
+2026-06-20 14:27:40 | INFO     | __main__:_download_sync:125 - Dukascopy EURUSD 15m bi5: 2026-06-17 → 2026-06-20 ...
+2026-06-20 14:32:14 | INFO     | __main__:_download_sync:155 -   EURUSD: 158,094 total ticks → aggregating to 15m ...
+2026-06-20 14:32:14 | INFO     | __main__:_download_sync:164 - Dukascopy: 204 candles cho EURUSD 15m
+2026-06-20 14:35:46 | INFO     | __main__:main:751 - MT5 Scalper | mode=download | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 14:35:46 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 14:35:46 | INFO     | phase1_data.dukascopy_downloader:connect:86 - DukascopyDownloader ready (bi5 feed, no API key needed)
+2026-06-20 14:35:46 | INFO     | __main__:run_download:98 - Dukascopy EURUSD: downloading ticks once → ['15m', '1h']
+2026-06-20 14:35:46 | INFO     | phase1_data.dukascopy_downloader:_download_sync:142 - Dukascopy EURUSD 15m bi5: 2026-06-19 → 2026-06-20 ...
+2026-06-20 14:35:56 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   EURUSD: 51,397 total ticks → aggregating to 15m ...
+2026-06-20 14:35:56 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 0 candles cho EURUSD 15m
+2026-06-20 14:35:56 | INFO     | __main__:run_download:109 - No new candles for EURUSD 15m (already up to date)
+2026-06-20 14:35:56 | INFO     | phase1_data.dukascopy_downloader:_download_sync:135 - Dukascopy EURUSD 1h: using cached ticks (51,397 ticks)
+2026-06-20 14:35:56 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   EURUSD: 51,397 total ticks → aggregating to 1h ...
+2026-06-20 14:35:56 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 0 candles cho EURUSD 1h
+2026-06-20 14:35:56 | INFO     | __main__:run_download:109 - No new candles for EURUSD 1h (already up to date)
+2026-06-20 14:35:56 | INFO     | __main__:run_download:98 - Dukascopy GBPUSD: downloading ticks once → ['15m', '1h']
+2026-06-20 14:35:56 | INFO     | phase1_data.dukascopy_downloader:_download_sync:142 - Dukascopy GBPUSD 15m bi5: 2026-06-19 → 2026-06-20 ...
+2026-06-20 14:36:07 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   GBPUSD: 74,645 total ticks → aggregating to 15m ...
+2026-06-20 14:36:07 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 0 candles cho GBPUSD 15m
+2026-06-20 14:36:07 | INFO     | __main__:run_download:109 - No new candles for GBPUSD 15m (already up to date)
+2026-06-20 14:36:07 | INFO     | phase1_data.dukascopy_downloader:_download_sync:135 - Dukascopy GBPUSD 1h: using cached ticks (74,645 ticks)
+2026-06-20 14:36:07 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   GBPUSD: 74,645 total ticks → aggregating to 1h ...
+2026-06-20 14:36:07 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 0 candles cho GBPUSD 1h
+2026-06-20 14:36:07 | INFO     | __main__:run_download:109 - No new candles for GBPUSD 1h (already up to date)
+2026-06-20 14:36:07 | INFO     | __main__:run_download:98 - Dukascopy USDJPY: downloading ticks once → ['15m', '1h']
+2026-06-20 14:36:07 | INFO     | phase1_data.dukascopy_downloader:_download_sync:142 - Dukascopy USDJPY 15m bi5: 2026-06-19 → 2026-06-20 ...
+2026-06-20 14:36:17 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   USDJPY: 58,779 total ticks → aggregating to 15m ...
+2026-06-20 14:36:17 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 0 candles cho USDJPY 15m
+2026-06-20 14:36:17 | INFO     | __main__:run_download:109 - No new candles for USDJPY 15m (already up to date)
+2026-06-20 14:36:17 | INFO     | phase1_data.dukascopy_downloader:_download_sync:135 - Dukascopy USDJPY 1h: using cached ticks (58,779 ticks)
+2026-06-20 14:36:17 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   USDJPY: 58,779 total ticks → aggregating to 1h ...
+2026-06-20 14:36:17 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 0 candles cho USDJPY 1h
+2026-06-20 14:36:17 | INFO     | __main__:run_download:109 - No new candles for USDJPY 1h (already up to date)
+2026-06-20 14:36:17 | INFO     | __main__:run_download:98 - Dukascopy XAUUSD: downloading ticks once → ['15m', '1h']
+2026-06-20 14:36:17 | INFO     | phase1_data.dukascopy_downloader:_download_sync:142 - Dukascopy XAUUSD 15m bi5: 2026-06-19 → 2026-06-20 ...
+2026-06-20 14:36:29 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   XAUUSD: 203,189 total ticks → aggregating to 15m ...
+2026-06-20 14:36:29 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 0 candles cho XAUUSD 15m
+2026-06-20 14:36:29 | INFO     | __main__:run_download:109 - No new candles for XAUUSD 15m (already up to date)
+2026-06-20 14:36:29 | INFO     | phase1_data.dukascopy_downloader:_download_sync:135 - Dukascopy XAUUSD 1h: using cached ticks (203,189 ticks)
+2026-06-20 14:36:29 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   XAUUSD: 203,189 total ticks → aggregating to 1h ...
+2026-06-20 14:36:29 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 0 candles cho XAUUSD 1h
+2026-06-20 14:36:29 | INFO     | __main__:run_download:109 - No new candles for XAUUSD 1h (already up to date)
+2026-06-20 14:36:29 | INFO     | __main__:run_download:98 - Dukascopy USDCAD: downloading ticks once → ['15m', '1h']
+2026-06-20 14:36:29 | INFO     | phase1_data.dukascopy_downloader:_download_sync:142 - Dukascopy USDCAD 15m bi5: 2026-06-19 → 2026-06-20 ...
+2026-06-20 14:36:40 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   USDCAD: 66,913 total ticks → aggregating to 15m ...
+2026-06-20 14:36:40 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 0 candles cho USDCAD 15m
+2026-06-20 14:36:40 | INFO     | __main__:run_download:109 - No new candles for USDCAD 15m (already up to date)
+2026-06-20 14:36:40 | INFO     | phase1_data.dukascopy_downloader:_download_sync:135 - Dukascopy USDCAD 1h: using cached ticks (66,913 ticks)
+2026-06-20 14:36:40 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   USDCAD: 66,913 total ticks → aggregating to 1h ...
+2026-06-20 14:36:40 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 0 candles cho USDCAD 1h
+2026-06-20 14:36:40 | INFO     | __main__:run_download:109 - No new candles for USDCAD 1h (already up to date)
+2026-06-20 14:36:41 | INFO     | __main__:run_download:98 - Dukascopy AUDUSD: downloading ticks once → ['15m', '1h']
+2026-06-20 14:36:41 | INFO     | phase1_data.dukascopy_downloader:_download_sync:142 - Dukascopy AUDUSD 15m bi5: 2024-06-20 → 2026-06-20 ...
+2026-06-20 14:43:05 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   AUDUSD: 30/730 days (4%) — 1,451,768 ticks so far
+2026-06-20 14:49:41 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 14:49:41 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 14:50:59 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 14:50:59 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 14:51:45 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 14:51:48 | INFO     | phase1_data.database:disconnect:191 - Database disconnected
+2026-06-20 14:52:09 | INFO     | __main__:main:751 - MT5 Scalper | mode=download | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-20 14:52:10 | INFO     | phase1_data.database:connect:179 - Database connected and schema ensured
+2026-06-20 14:52:10 | INFO     | phase1_data.dukascopy_downloader:connect:86 - DukascopyDownloader ready (bi5 feed, no API key needed)
+2026-06-20 14:52:10 | INFO     | __main__:run_download:98 - Dukascopy EURUSD: downloading ticks once → ['15m', '1h']
+2026-06-20 14:52:10 | INFO     | phase1_data.dukascopy_downloader:_download_sync:142 - Dukascopy EURUSD 15m bi5: 2024-06-20 → 2026-06-20 ...
+2026-06-20 14:57:26 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 30/730 days (4%) — 1,892,350 ticks so far
+2026-06-20 15:02:57 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 60/730 days (8%) — 4,332,471 ticks so far
+2026-06-20 15:09:02 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 90/730 days (12%) — 6,785,175 ticks so far
+2026-06-20 15:14:47 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 120/730 days (16%) — 9,913,122 ticks so far
+2026-06-20 15:21:42 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 150/730 days (21%) — 12,479,625 ticks so far
+2026-06-20 15:28:33 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 180/730 days (25%) — 15,564,088 ticks so far
+2026-06-20 15:36:09 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 210/730 days (29%) — 19,549,359 ticks so far
+2026-06-20 15:43:47 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 240/730 days (33%) — 23,508,649 ticks so far
+2026-06-20 15:52:45 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 270/730 days (37%) — 26,362,688 ticks so far
+2026-06-20 16:00:53 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 300/730 days (41%) — 28,377,667 ticks so far
+2026-06-20 16:07:41 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 330/730 days (45%) — 30,280,568 ticks so far
+2026-06-20 16:14:16 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 360/730 days (49%) — 32,174,868 ticks so far
+2026-06-20 16:21:08 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 390/730 days (53%) — 33,987,140 ticks so far
+2026-06-20 16:27:47 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 420/730 days (58%) — 35,726,818 ticks so far
+2026-06-20 16:35:06 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 450/730 days (62%) — 38,331,858 ticks so far
+2026-06-20 16:42:38 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 480/730 days (66%) — 41,227,760 ticks so far
+2026-06-20 16:50:33 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   EURUSD: 510/730 days (70%) — 43,378,580 ticks so far
+2026-06-20 16:53:32 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   EURUSD: 44,187,101 total ticks → aggregating to 15m ...
+2026-06-20 16:53:44 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 48333 candles cho EURUSD 15m
+2026-06-20 16:53:45 | INFO     | __main__:run_download:107 - Saved 48333 candles for EURUSD 15m
+2026-06-20 16:53:45 | INFO     | phase1_data.dukascopy_downloader:_download_sync:135 - Dukascopy EURUSD 1h: using cached ticks (44,187,101 ticks)
+2026-06-20 16:53:45 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   EURUSD: 44,187,101 total ticks → aggregating to 1h ...
+2026-06-20 16:53:55 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 12085 candles cho EURUSD 1h
+2026-06-20 16:53:55 | INFO     | __main__:run_download:107 - Saved 12085 candles for EURUSD 1h
+2026-06-20 16:53:55 | INFO     | __main__:run_download:98 - Dukascopy GBPUSD: downloading ticks once → ['15m', '1h']
+2026-06-20 16:53:55 | INFO     | phase1_data.dukascopy_downloader:_download_sync:142 - Dukascopy GBPUSD 15m bi5: 2024-06-20 → 2026-06-20 ...
+2026-06-20 17:02:44 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 30/730 days (4%) — 2,017,206 ticks so far
+2026-06-20 17:12:52 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 60/730 days (8%) — 4,334,561 ticks so far
+2026-06-20 17:21:50 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 90/730 days (12%) — 7,196,703 ticks so far
+2026-06-20 17:30:01 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 120/730 days (16%) — 10,951,312 ticks so far
+2026-06-20 17:39:07 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 150/730 days (21%) — 13,745,071 ticks so far
+2026-06-20 17:47:35 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 180/730 days (25%) — 17,190,235 ticks so far
+2026-06-20 17:57:03 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 210/730 days (29%) — 20,735,569 ticks so far
+2026-06-20 18:06:13 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 240/730 days (33%) — 24,238,367 ticks so far
+2026-06-20 18:18:51 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 270/730 days (37%) — 26,707,895 ticks so far
+2026-06-20 18:26:40 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 300/730 days (41%) — 29,010,801 ticks so far
+2026-06-20 18:35:24 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 330/730 days (45%) — 31,138,564 ticks so far
+2026-06-20 18:42:51 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 360/730 days (49%) — 33,389,935 ticks so far
+2026-06-20 18:51:16 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 390/730 days (53%) — 35,779,853 ticks so far
+2026-06-20 19:00:02 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 420/730 days (58%) — 37,874,438 ticks so far
+2026-06-20 19:08:25 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 450/730 days (62%) — 40,995,494 ticks so far
+2026-06-20 19:17:07 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 480/730 days (66%) — 44,564,086 ticks so far
+2026-06-20 19:25:01 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   GBPUSD: 510/730 days (70%) — 47,334,966 ticks so far
+2026-06-20 19:27:56 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   GBPUSD: 48,464,954 total ticks → aggregating to 15m ...
+2026-06-20 19:28:11 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 48003 candles cho GBPUSD 15m
+2026-06-20 19:28:12 | INFO     | __main__:run_download:107 - Saved 48003 candles for GBPUSD 15m
+2026-06-20 19:28:12 | INFO     | phase1_data.dukascopy_downloader:_download_sync:135 - Dukascopy GBPUSD 1h: using cached ticks (48,464,954 ticks)
+2026-06-20 19:28:12 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   GBPUSD: 48,464,954 total ticks → aggregating to 1h ...
+2026-06-20 19:28:27 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 12003 candles cho GBPUSD 1h
+2026-06-20 19:28:27 | INFO     | __main__:run_download:107 - Saved 12003 candles for GBPUSD 1h
+2026-06-20 19:28:27 | INFO     | __main__:run_download:98 - Dukascopy USDJPY: downloading ticks once → ['15m', '1h']
+2026-06-20 19:28:27 | INFO     | phase1_data.dukascopy_downloader:_download_sync:142 - Dukascopy USDJPY 15m bi5: 2024-06-20 → 2026-06-20 ...
+2026-06-20 19:36:19 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 30/730 days (4%) — 4,057,605 ticks so far
+2026-06-20 19:44:09 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 60/730 days (8%) — 10,734,379 ticks so far
+2026-06-20 19:52:23 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 90/730 days (12%) — 16,128,183 ticks so far
+2026-06-20 20:02:01 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 120/730 days (16%) — 21,963,582 ticks so far
+2026-06-20 20:18:00 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 150/730 days (21%) — 26,184,195 ticks so far
+2026-06-20 20:26:00 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 180/730 days (25%) — 30,889,098 ticks so far
+2026-06-20 20:33:27 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 210/730 days (29%) — 37,549,208 ticks so far
+2026-06-20 20:42:33 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 240/730 days (33%) — 42,663,889 ticks so far
+2026-06-20 20:48:35 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 270/730 days (37%) — 46,222,876 ticks so far
+2026-06-20 20:59:40 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 300/730 days (41%) — 48,910,417 ticks so far
+2026-06-20 21:06:31 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 330/730 days (45%) — 51,494,798 ticks so far
+2026-06-20 21:12:23 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 360/730 days (49%) — 54,418,108 ticks so far
+2026-06-20 21:18:08 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 390/730 days (53%) — 57,286,863 ticks so far
+2026-06-20 21:23:42 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 420/730 days (58%) — 59,927,334 ticks so far
+2026-06-20 21:31:30 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 450/730 days (62%) — 63,230,238 ticks so far
+2026-06-20 21:40:31 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 480/730 days (66%) — 66,020,094 ticks so far
+2026-06-20 21:47:00 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDJPY: 510/730 days (70%) — 68,257,493 ticks so far
+2026-06-20 21:49:06 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   USDJPY: 68,965,598 total ticks → aggregating to 15m ...
+2026-06-20 21:49:26 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 47977 candles cho USDJPY 15m
+2026-06-20 21:49:27 | INFO     | __main__:run_download:107 - Saved 47977 candles for USDJPY 15m
+2026-06-20 21:49:27 | INFO     | phase1_data.dukascopy_downloader:_download_sync:135 - Dukascopy USDJPY 1h: using cached ticks (68,965,598 ticks)
+2026-06-20 21:49:27 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   USDJPY: 68,965,598 total ticks → aggregating to 1h ...
+2026-06-20 21:49:48 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 11995 candles cho USDJPY 1h
+2026-06-20 21:49:48 | INFO     | __main__:run_download:107 - Saved 11995 candles for USDJPY 1h
+2026-06-20 21:49:48 | INFO     | __main__:run_download:98 - Dukascopy XAUUSD: downloading ticks once → ['15m', '1h']
+2026-06-20 21:49:48 | INFO     | phase1_data.dukascopy_downloader:_download_sync:142 - Dukascopy XAUUSD 15m bi5: 2024-06-20 → 2026-06-20 ...
+2026-06-20 21:57:46 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 30/730 days (4%) — 7,076,180 ticks so far
+2026-06-20 22:04:45 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 60/730 days (8%) — 14,751,907 ticks so far
+2026-06-20 22:11:42 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 90/730 days (12%) — 22,078,857 ticks so far
+2026-06-20 22:26:24 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 120/730 days (16%) — 29,668,026 ticks so far
+2026-06-20 22:34:47 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 150/730 days (21%) — 36,445,952 ticks so far
+2026-06-20 22:41:54 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 180/730 days (25%) — 44,846,531 ticks so far
+2026-06-20 22:50:55 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 210/730 days (29%) — 53,236,700 ticks so far
+2026-06-20 23:00:36 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 240/730 days (33%) — 60,152,531 ticks so far
+2026-06-20 23:08:51 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 270/730 days (37%) — 66,714,530 ticks so far
+2026-06-20 23:18:21 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 300/730 days (41%) — 72,598,778 ticks so far
+2026-06-20 23:27:46 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 330/730 days (45%) — 79,132,806 ticks so far
+2026-06-20 23:35:54 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 360/730 days (49%) — 90,404,745 ticks so far
+2026-06-20 23:47:44 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 390/730 days (53%) — 100,144,289 ticks so far
+2026-06-21 00:02:04 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 420/730 days (58%) — 110,742,625 ticks so far
+2026-06-21 00:18:16 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 450/730 days (62%) — 122,151,896 ticks so far
+2026-06-21 00:32:33 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 480/730 days (66%) — 132,949,161 ticks so far
+2026-06-21 00:46:22 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   XAUUSD: 510/730 days (70%) — 144,481,590 ticks so far
+2026-06-21 00:52:49 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   XAUUSD: 148,939,651 total ticks → aggregating to 15m ...
+2026-06-21 00:53:36 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 45473 candles cho XAUUSD 15m
+2026-06-21 00:53:37 | INFO     | __main__:run_download:107 - Saved 45473 candles for XAUUSD 15m
+2026-06-21 00:53:37 | INFO     | phase1_data.dukascopy_downloader:_download_sync:135 - Dukascopy XAUUSD 1h: using cached ticks (148,939,651 ticks)
+2026-06-21 00:53:37 | INFO     | phase1_data.dukascopy_downloader:_download_sync:175 -   XAUUSD: 148,939,651 total ticks → aggregating to 1h ...
+2026-06-21 00:54:23 | INFO     | phase1_data.dukascopy_downloader:_download_sync:184 - Dukascopy: 11376 candles cho XAUUSD 1h
+2026-06-21 00:54:24 | INFO     | __main__:run_download:107 - Saved 11376 candles for XAUUSD 1h
+2026-06-21 00:54:24 | INFO     | __main__:run_download:98 - Dukascopy USDCAD: downloading ticks once → ['15m', '1h']
+2026-06-21 00:54:24 | INFO     | phase1_data.dukascopy_downloader:_download_sync:142 - Dukascopy USDCAD 15m bi5: 2024-06-20 → 2026-06-20 ...
+2026-06-21 01:07:31 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 30/730 days (4%) — 1,853,927 ticks so far
+2026-06-21 01:29:18 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 60/730 days (8%) — 3,923,796 ticks so far
+2026-06-21 01:44:19 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 90/730 days (12%) — 6,553,985 ticks so far
+2026-06-21 01:56:22 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 120/730 days (16%) — 9,304,340 ticks so far
+2026-06-21 02:09:00 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 150/730 days (21%) — 11,873,379 ticks so far
+2026-06-21 02:20:47 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 180/730 days (25%) — 15,189,027 ticks so far
+2026-06-21 02:32:03 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 210/730 days (29%) — 19,507,158 ticks so far
+2026-06-21 02:42:19 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 240/730 days (33%) — 22,332,230 ticks so far
+2026-06-21 02:53:01 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 270/730 days (37%) — 24,341,521 ticks so far
+2026-06-21 03:01:42 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 300/730 days (41%) — 26,342,278 ticks so far
+2026-06-21 03:11:07 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 330/730 days (45%) — 28,278,060 ticks so far
+2026-06-21 03:19:50 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 360/730 days (49%) — 30,296,906 ticks so far
+2026-06-21 03:29:43 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 390/730 days (53%) — 32,620,004 ticks so far
+2026-06-21 03:41:24 | INFO     | phase1_data.dukascopy_downloader:_download_sync:162 -   USDCAD: 420/730 days (58%) — 34,688,893 ticks so far
