@@ -2,6 +2,7 @@
 Telegram alert service.
 """
 import asyncio
+import ssl
 import aiohttp
 from utils.logger import logger
 from config.settings import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
@@ -21,7 +22,11 @@ class TelegramAlert:
         try:
             url = f"{self.base_url}/sendMessage"
             payload = {"chat_id": self.chat_id, "text": message, "parse_mode": "HTML"}
-            async with aiohttp.ClientSession() as session:
+            ssl_ctx = ssl.create_default_context()
+            ssl_ctx.check_hostname = False
+            ssl_ctx.verify_mode = ssl.CERT_NONE
+            connector = aiohttp.TCPConnector(ssl=ssl_ctx)
+            async with aiohttp.ClientSession(connector=connector) as session:
                 async with session.post(url, json=payload, timeout=aiohttp.ClientTimeout(total=5)) as resp:
                     if resp.status == 200:
                         return True
