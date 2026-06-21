@@ -70,14 +70,15 @@ def start_mt5():
 
 
 def start_bot():
-    """Start trading bot."""
+    """Start trading bot via bat file."""
+    bat = Path(BOT_SCRIPT).parent / "start_bot.bat"
     try:
         subprocess.Popen(
-            [BOT_VENV, BOT_SCRIPT, "live"],
+            ["cmd", "/c", "start", "", str(bat)],
             cwd=str(Path(BOT_SCRIPT).parent),
-            creationflags=subprocess.DETACHED_PROCESS,
+            shell=False,
         )
-        logger.info("Bot started")
+        logger.info(f"Bot started via {bat}")
         return True
     except Exception as e:
         logger.error(f"Failed to start bot: {e}")
