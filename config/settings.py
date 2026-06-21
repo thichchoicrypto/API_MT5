@@ -72,6 +72,7 @@ DATA_SOURCE = os.getenv(
 # Download: https://www.metatrader5.com/en/download
 # pip install MetaTrader5
 # ─────────────────────────────────────────────
+MT5_ENABLED   = os.getenv("MT5_ENABLED", "true").lower() == "true"
 MT5_LOGIN     = int(os.getenv("MT5_LOGIN", "0"))
 MT5_PASSWORD  = os.getenv("MT5_PASSWORD", "")
 MT5_SERVER    = os.getenv("MT5_SERVER", "")
