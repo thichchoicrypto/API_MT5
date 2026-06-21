@@ -46,6 +46,15 @@ def is_process_running(name: str) -> bool:
     return name.lower() in result.stdout.lower()
 
 
+def count_process(name: str) -> int:
+    """Đếm số lần process đang chạy."""
+    result = subprocess.run(
+        ["tasklist", "/FI", f"IMAGENAME eq {name}", "/NH"],
+        capture_output=True, text=True
+    )
+    return result.stdout.lower().count(name.lower())
+
+
 def start_mt5():
     """Start MT5 Terminal process."""
     if not Path(MT5_EXE).exists():
@@ -106,7 +115,8 @@ def main():
                     ))
 
             # ── Check Bot process ───────────────────────
-            if not is_process_running("python.exe"):
+            # Watchdog itself is python.exe — cần >=2 python processes để bot đang chạy
+            if count_process("python.exe") < 2:
                 bot_restarts += 1
                 logger.warning(f"Bot not running! Restarting... (#{bot_restarts})")
                 # Đảm bảo MT5 đang chạy trước khi start bot

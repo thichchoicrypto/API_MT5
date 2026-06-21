@@ -299,15 +299,61 @@ python3 main.py backtest
 
 ## Auto-Start with Task Scheduler
 
-1. Open **Task Scheduler** → **Create Basic Task**
-2. Trigger: At startup (delay 2 min to let MT5 start)
-3. Action: Start a program
-   - Program: `C:\Projects\API_MT5\venv\Scripts\python.exe`
-   - Arguments: `C:\Projects\API_MT5\main.py live`
-   - Start in: `C:\Projects\API_MT5`
-4. Check **"Run whether user is logged on or not"**
+Add **3 tasks** in order (all: Run whether user is logged on or not):
 
-> MT5 Terminal must also auto-start. Add it to Task Scheduler separately with earlier trigger.
+| Task | Program | Arguments | Delay |
+|---|---|---|---|
+| 1. MT5 Terminal | `C:\Program Files\MetaTrader 5\terminal64.exe` | _(none)_ | 1 min after startup |
+| 2. Trading Bot | `C:\Projects\API_MT5\venv\Scripts\python.exe` | `C:\Projects\API_MT5\main.py live` | 3 min after startup |
+| 3. MT5 Watchdog | `C:\Projects\API_MT5\venv\Scripts\python.exe` | `C:\Projects\API_MT5\tools\mt5_watchdog.py` | 4 min after startup |
+
+Steps for each task:
+1. Open **Task Scheduler** → **Create Basic Task**
+2. Trigger: **At startup** → set delay in "Advanced settings"
+3. Action: **Start a program** → fill Program + Arguments + Start in (`C:\Projects\API_MT5`)
+4. Check ✅ **Run whether user is logged on or not**
+
+---
+
+## MT5 Watchdog
+
+`tools/mt5_watchdog.py` chạy song song với bot, check mỗi 60s:
+
+- `terminal64.exe` không chạy → restart MT5, chờ 15s, Telegram alert
+- `python.exe` không chạy → restart bot (chỉ sau khi MT5 sẵn sàng)
+- Đếm số lần restart để phát hiện vấn đề lặp lại
+
+```powershell
+# Chạy thủ công (PowerShell riêng)
+cd C:\Projects\API_MT5
+venv\Scripts\activate
+python tools/mt5_watchdog.py
+```
+
+Telegram alerts từ watchdog:
+- `🐶 MT5 Watchdog started` — khi watchdog khởi động
+- `⚠️ MT5 Terminal crashed — restarted (#N)` — khi restart MT5
+- `⚠️ Bot crashed — restarted (#N)` — khi restart bot
+- `🔴 MT5/Bot restart FAILED` — khi restart thất bại, cần can thiệp tay
+
+> **Lưu ý:** ICMarkets demo account hết hạn sau 30 ngày không có trade. Khi hết hạn MT5 vẫn chạy nhưng login fail — cần renew account.
+
+---
+
+## Telegram Notification Reference
+
+| Emoji | Sự kiện |
+|---|---|
+| 🚀 | Bot started |
+| ⏹ | Bot stopped (graceful) |
+| 🔴 | Bot crashed / MT5 init failed |
+| ⚠️ | MT5 stale / reconnecting / watchdog restart |
+| ⏳ | LIMIT order pending |
+| ✅ | MARKET order filled / TP hit |
+| 🚫 | LIMIT order cancelled (timeout) |
+| 🔒 | Position closed (manual/SL) |
+| 🔴 | SL hit (P&L âm) |
+| 🐶 | Watchdog started |
 
 ---
 
