@@ -487,7 +487,8 @@ async def run_live():
         await database.disconnect()
         loop.stop()
 
-    loop.add_signal_handler(signal.SIGTERM, _handle_sigterm)
+    if sys.platform != "win32":
+        loop.add_signal_handler(signal.SIGTERM, _handle_sigterm)
 
     try:
         await engine.start(db)
