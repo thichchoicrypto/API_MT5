@@ -162,7 +162,7 @@ class MT5StreamingCollector:
                         continue
                     if self.db:
                         try:
-                            await self.db.upsert_candle(candle)
+                            await self.db.upsert_candle(candle["symbol"], candle["timeframe"], candle)
                         except Exception as e:
                             logger.error(f"DB upsert error: {e}")
                     if self.on_candle:
