@@ -290,6 +290,10 @@ python3 main.py backtest
 | `UnicodeDecodeError cp1252` | Special chars in requirements.txt | Use ASCII-only characters in requirements.txt (no `═`, `─` etc.) |
 | MT5 server only shows MetaQuotes-Demo | Wrong server selected | File → Open an Account → search "IC Markets" → select Raw Trading Ltd |
 | `authorization on MetaQuotes-Demo failed` | MT5 logged into wrong server | Re-login via File → Login to Trade Account, select ICMarketsSC-Demo |
+| `git pull` blocked by `logs/scalper.log` unmerged | Log files tracked by git + bot locking them | Run once: `git rm --cached logs/scalper.log logs/scalper_errors.log` then `Add-Content .gitignore "logs/"` then commit + push. On Mac: `git fetch origin && git reset --hard origin/main` |
+| `database "mt5_scalper_mac" does not exist` after git stash pop | stash restored old .env with wrong DB_NAME | Run: `(Get-Content .env) -replace 'mt5_scalper_mac','mt5_scalper_db' \| Set-Content .env` |
+| New symbols not exported (NZDUSD/USDCHF/GBPJPY missing) | export ran before `git pull` updated SYMBOLS list | Re-run export after pull: `python tools/export_candles.py --dir export_data` then add/commit/push specific CSV files |
+| `git commit` fails with "unmerged files" on logs | Log files stuck in unmerged state from failed stash | `git rm --cached logs/scalper.log logs/scalper_errors.log` to remove from index, then commit |
 
 ---
 

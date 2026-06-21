@@ -43,7 +43,7 @@ _PROFILES = {
         "max_leverage":       30,
     },
     "AGGRESSIVE": {
-        "symbols":            ["GBPUSD", "USDJPY", "XAUUSD", "AUDUSD", "EURJPY", "NZDUSD", "USDCHF", "GBPJPY"],
+        "symbols":            ["GBPUSD", "USDJPY", "XAUUSD", "AUDUSD", "EURJPY", "GBPJPY"],
         "risk_per_trade":     0.03,
         "max_daily_loss":     0.06,
         "max_drawdown":       0.15,
