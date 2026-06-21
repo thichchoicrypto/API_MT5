@@ -1,39 +1,37 @@
-# ══════════════════════════════════════════════
-# MT5 SMC Scalper Bot — Requirements
-# ══════════════════════════════════════════════
+# MT5 SMC Scalper Bot - Requirements
 # Mac/Linux : pip install -r requirements.txt
 # Windows   : uncomment MetaTrader5 line below
 
-# ─── Core async ───────────────────────────────
+# Core async
 asyncio-throttle>=1.0.2
 aiofiles>=23.2.1
 aiohttp>=3.9.0
 
-# ─── Data (Mac/Linux primary) ─────────────────
+# Data (Mac/Linux primary)
 yfinance>=0.2.40
 
-# ─── Data (Windows VPS — uncomment on VPS) ────
-# MetaTrader5>=5.0.45    # pip install MetaTrader5 (Windows 64-bit only)
+# Data (Windows VPS - uncomment on VPS)
+MetaTrader5>=5.0.45
 
-# ─── Database ─────────────────────────────────
+# Database
 asyncpg>=0.29.0
 python-dotenv>=1.0.0
 
-# ─── Web Dashboard ────────────────────────────
+# Web Dashboard
 fastapi>=0.110.0
 uvicorn[standard]>=0.29.0
 pydantic>=2.0.0
 
-# ─── Notifications ────────────────────────────
-httpx>=0.27.0          # Telegram async HTTP
+# Notifications
+httpx>=0.27.0
 
-# ─── Strategy / Math ──────────────────────────
+# Strategy / Math
 numpy>=1.26.0
 pandas>=2.2.0
 
-# ─── Logging ──────────────────────────────────
+# Logging
 loguru>=0.7.2
 
-# ─── Testing ──────────────────────────────────
+# Testing
 pytest>=8.0.0
 pytest-asyncio>=0.23.0
