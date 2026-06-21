@@ -116,6 +116,16 @@ class MT5StreamingCollector:
                         )
                         _init_mt5()
                         self._last_seen[key] = time.time()
+                        # Fire-and-forget Telegram (sync context)
+                        import asyncio as _asyncio
+                        try:
+                            loop = _asyncio.get_event_loop()
+                            if loop.is_running():
+                                _asyncio.ensure_future(telegram.send(
+                                    f"⚠️ MT5 Stale {age:.0f}s — reconnecting\n[{symbol} {tf}]"
+                                ))
+                        except Exception:
+                            pass
                     continue
 
                 self._last_bar_time[key] = open_time
@@ -140,6 +150,7 @@ class MT5StreamingCollector:
         ok = await loop.run_in_executor(None, _init_mt5)
         if not ok:
             logger.error("MT5 init failed — collector aborted")
+            await telegram.send("🔴 MT5 init FAILED — collector aborted. Check MT5 Terminal!")
             return
 
         logger.info(
@@ -172,6 +183,7 @@ class MT5StreamingCollector:
                             logger.error(f"on_candle callback error: {e}", exc_info=True)
             except Exception as e:
                 logger.error(f"MT5 poll loop error: {e}", exc_info=True)
+                await telegram.send(f"🔴 MT5 poll error: {e}\nReconnecting in {WS_RECONNECT_DELAY}s...")
                 await asyncio.sleep(WS_RECONNECT_DELAY)
                 await loop.run_in_executor(None, _init_mt5)
 

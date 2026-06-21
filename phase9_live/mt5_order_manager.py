@@ -126,10 +126,15 @@ class MT5OrderManager:
         logger.info(
             f"✅ Order placed {symbol} {side} {volume:.2f}lots ticket={ticket}"
         )
-        await telegram.send(
-            f"✅ [{order_type}] {symbol} {side} {volume:.2f}L\n"
-            f"ticket={ticket} SL={sl} TP={tp}"
-        )
+        if order_type == "MARKET":
+            await telegram.send(
+                f"✅ [LIVE] MARKET {side} {symbol} filled\n"
+                f"  Entry  : {result.price:.5f}\n"
+                f"  SL     : {sl:.5f}\n"
+                f"  TP     : {tp:.5f}\n"
+                f"  Lots   : {volume:.2f}L  ticket=#{ticket}"
+            )
+        # LIMIT placed message is sent by live_engine (_pending_limit_orders block)
         return ticket
 
     # ──────────────────────────────────────────────────────────
@@ -209,8 +214,11 @@ class MT5OrderManager:
 
         ok = await self._run(_close)
         if ok:
-            logger.info(f"Position closed ticket={ticket}")
-            await telegram.send(f"🔒 Position closed ticket={ticket} {symbol}")
+            logger.info(f"Position closed ticket={ticket} {symbol}")
+            await telegram.send(
+                f"🔒 [LIVE] Position closed {symbol}\n"
+                f"  ticket : #{ticket}"
+            )
         else:
             logger.error(f"close_position FAILED ticket={ticket}")
         return ok

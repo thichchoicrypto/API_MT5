@@ -565,10 +565,12 @@ class LiveTradingEngine:
                 "placed_at": datetime.now(tz=timezone.utc),
             }
             await telegram.send(
-                f"📋 [LIVE] LIMIT order #{order_id} đặt\n"
-                f"{symbol} {signal['side']} @ {signal['entry_price']:.5f}\n"
-                f"SL={risk['sl']:.5f} TP={tp_level:.5f} RR={risk['rr']:.1f}\n"
-                f"Chờ fill (timeout {LIMIT_ORDER_TIMEOUT_CANDLES} nến)"
+                f"⏳ [LIVE] LIMIT pending {signal['side']} {symbol}\n"
+                f"  Entry : {signal['entry_price']:.5f}\n"
+                f"  SL    : {risk['sl']:.5f}\n"
+                f"  TP    : {tp_level:.5f}\n"
+                f"  Lots  : {qty:.2f}L  RR={risk['rr']:.1f}R\n"
+                f"  TTL   : {LIMIT_ORDER_TIMEOUT_CANDLES} nến {ENTRY_TIMEFRAME}"
             )
 
     async def _place_sl_tp_for_limit(self, symbol: str, signal: Dict, risk: Dict,
@@ -746,10 +748,15 @@ class LiveTradingEngine:
                             f"— tự cancel"
                         )
                         await self.order_manager.cancel_order(pend["order_id"])
+                        _sig = pend.get("signal", {})
+                        _rsk = pend.get("risk", {})
+                        _tp  = pend.get("tp_level", 0)
                         await telegram.send(
-                            f"⏱ [LIVE] LIMIT order {symbol} #{pend['order_id']} "
-                            f"đã tự cancel sau {LIMIT_ORDER_TIMEOUT_CANDLES} candle "
-                            f"{ENTRY_TIMEFRAME} chưa khớp"
+                            f"🚫 [LIVE] LIMIT {_sig.get('side','')} {symbol} cancelled\n"
+                            f"  Entry : {_sig.get('entry_price', 0):.5f}\n"
+                            f"  SL    : {_rsk.get('sl', 0):.5f}\n"
+                            f"  TP    : {_tp:.5f}\n"
+                            f"  Lý do : timeout {LIMIT_ORDER_TIMEOUT_CANDLES} nến {ENTRY_TIMEFRAME} chưa khớp"
                         )
                         del self._pending_limit_orders[symbol]
                         continue
@@ -800,9 +807,13 @@ class LiveTradingEngine:
                     # Position closed on MT5 (TP/SL hit) — fetch close details
                     exit_price, pnl, status = await self._get_close_details(symbol, pos)
 
-                    msg = (f"{'✅' if pnl and pnl > 0 else '❌'} [LIVE] CLOSED "
-                           f"{pos.side} {symbol} | "
-                           f"Exit={exit_price:.2f} PnL={pnl:+.2f} | {status}")
+                    icon = "✅" if pnl and pnl > 0 else ("🔴" if pnl and pnl < 0 else "⚪")
+                    msg = (
+                        f"{icon} [LIVE] {status} {pos.side} {symbol}\n"
+                        f"  Exit  : {exit_price:.5f}\n"
+                        f"  P&L   : ${pnl:+.2f}\n"
+                        f"  Entry : {pos.entry_price:.5f}"
+                    )
                     logger.info(msg)
                     await telegram.send(msg)
 

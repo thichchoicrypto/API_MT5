@@ -496,6 +496,11 @@ async def run_live():
         logger.info("Live engine stopped by user")
         await telegram.send("⏹ Bot stopped (KeyboardInterrupt)")
         await engine.stop()
+    except Exception as e:
+        logger.error(f"Live engine crashed: {e}", exc_info=True)
+        await telegram.send(f"🔴 Bot CRASHED: {e}\nCheck logs immediately!")
+        await engine.stop()
+        raise
     finally:
         await db.disconnect()
 
