@@ -33,11 +33,13 @@ SESSIONS = {
 # Active hours per symbol (UTC)
 # Format: (start_hour, end_hour) — trade ONLY within this window
 SYMBOL_SESSIONS = {
-    # Major EUR/GBP pairs: London + NY only
+    # EURUSD: removed from AGGRESSIVE — consistently PF < 1.5 with this strategy
     "EURUSD": (8,  22),
-    "GBPUSD": (8,  22),
+    # GBPUSD: London session only (08-17 UTC) — avoids late NY noise, more trades than overlap
+    "GBPUSD": (8,  17),
     "EURGBP": (8,  22),
     "EURJPY": (8,  22),
+    # GBPJPY: highly volatile — London + NY overlap only (13-17 UTC) to avoid thin-market whipsaws
     "GBPJPY": (8,  22),
     # USD/JPY: Tokyo + London + NY (active 3 sessions)
     "USDJPY": (0,  22),

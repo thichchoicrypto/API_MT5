@@ -43,7 +43,7 @@ _PROFILES = {
         "max_leverage":       30,
     },
     "AGGRESSIVE": {
-        "symbols":            ["EURUSD", "GBPUSD", "USDJPY", "XAUUSD", "USDCAD", "AUDUSD", "EURJPY"],
+        "symbols":            ["GBPUSD", "USDJPY", "XAUUSD", "AUDUSD", "EURJPY", "NZDUSD", "USDCHF", "GBPJPY"],
         "risk_per_trade":     0.03,
         "max_daily_loss":     0.06,
         "max_drawdown":       0.15,
@@ -149,7 +149,7 @@ OB_LOOKBACK           = 10
 VOLUME_THRESHOLD      = 0.5
 ENTRY_CONFIRM_CANDLES = 1
 EQUAL_HIGH_THRESHOLD  = 0.0005
-SL_BUFFER             = 0.0003
+SL_BUFFER             = 0.0005   # 0.05% of price — wider buffer to avoid stop-hunting
 
 # ─────────────────────────────────────────────
 # PAPER TRADING

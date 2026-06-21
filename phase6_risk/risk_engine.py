@@ -94,7 +94,7 @@ class ForexRiskEngine:
         if side == "LONG":
             level = last_swing_low
             if level:
-                buffer = max(3 * pip, level * SL_BUFFER)
+                buffer = max(5 * pip, level * SL_BUFFER)
                 sl = round(level - buffer, 6)
             else:
                 sl = round(candles[-1]["close"] - atr * 2, 6)
@@ -106,7 +106,7 @@ class ForexRiskEngine:
         elif side == "SHORT":
             level = last_swing_high
             if level:
-                buffer = max(3 * pip, level * SL_BUFFER)
+                buffer = max(5 * pip, level * SL_BUFFER)
                 sl = round(level + buffer, 6)
             else:
                 sl = round(candles[-1]["close"] + atr * 2, 6)
@@ -287,7 +287,7 @@ class ForexRiskEngine:
         if side == "LONG":
             recent_lows = [c["low"] for c in candles[-5:]]
             new_hl = min(recent_lows)
-            buffer = max(3 * pip, new_hl * SL_BUFFER)
+            buffer = max(5 * pip, new_hl * SL_BUFFER)
             new_sl = new_hl - buffer
             if new_sl > current_sl and new_sl < current_price:
                 return round(new_sl, 6)
@@ -295,7 +295,7 @@ class ForexRiskEngine:
         elif side == "SHORT":
             recent_highs = [c["high"] for c in candles[-5:]]
             new_lh = max(recent_highs)
-            buffer = max(3 * pip, new_lh * SL_BUFFER)
+            buffer = max(5 * pip, new_lh * SL_BUFFER)
             new_sl = new_lh + buffer
             if new_sl < current_sl and new_sl > current_price:
                 return round(new_sl, 6)

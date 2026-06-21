@@ -13,8 +13,15 @@ from phase5_entry.trigger_detector import classify_trigger
 from utils.session_filter import is_trading_session, session_stop_reason
 
 # ADX threshold: below this = ranging market, skip trading
-ADX_MIN_THRESHOLD = 25
+# 28 (up from 25) — filters more low-quality ranging entries, reduces SL hits
+ADX_MIN_THRESHOLD = 28
 ADX_PERIOD = 14
+
+# Per-symbol ADX override — tighter filter for volatile/noisy pairs
+ADX_SYMBOL_OVERRIDE = {
+    "GBPUSD": 30,   # GBP more volatile, requires stronger trend confirmation
+    "GBPJPY": 30,   # GBP+JPY cross — double volatility, same stricter filter
+}
 
 
 
@@ -141,8 +148,9 @@ class EntryEngine:
         # ── Regime Filter: ADX (5m and 15m only) ─────────────────
         if self.timeframe in ("5m", "15m"):
             adx = calc_adx(candles)
-            if adx < ADX_MIN_THRESHOLD:
-                logger.debug(f"[{self.symbol}] Regime filter: ADX={adx:.1f} < {ADX_MIN_THRESHOLD} → skip")
+            adx_threshold = ADX_SYMBOL_OVERRIDE.get(self.symbol, ADX_MIN_THRESHOLD)
+            if adx < adx_threshold:
+                logger.debug(f"[{self.symbol}] Regime filter: ADX={adx:.1f} < {adx_threshold} → skip")
                 self.last_eval_debug["stop_reason"] = f"adx_low_{adx:.0f}"
                 return None
 
