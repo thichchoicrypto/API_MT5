@@ -128,7 +128,7 @@ class MT5StreamingCollector:
                     "high":      float(closed["high"]),
                     "low":       float(closed["low"]),
                     "close":     float(closed["close"]),
-                    "volume":    int(closed.get("tick_volume", 0)),
+                    "volume":    int(closed["tick_volume"]) if "tick_volume" in closed.dtype.names else 0,
                 }
                 new_candles.append(candle)
         return new_candles
