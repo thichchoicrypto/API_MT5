@@ -747,7 +747,7 @@ class LiveTradingEngine:
                             f"({LIMIT_ORDER_TIMEOUT_CANDLES} candle {ENTRY_TIMEFRAME}) "
                             f"— tự cancel"
                         )
-                        await self.order_manager.cancel_order(pend["order_id"])
+                        await self.order_manager.cancel_order(pend["ticket"])
                         _sig = pend.get("signal", {})
                         _rsk = pend.get("risk", {})
                         _tp  = pend.get("tp_level", 0)
