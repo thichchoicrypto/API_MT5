@@ -101,7 +101,10 @@ class MT5StreamingCollector:
                 if rates is None or len(rates) < 2:
                     continue
 
-                closed = rates[1]   # bar[1] = last fully closed bar
+                # MT5 Python trả về array theo thứ tự cũ→mới:
+                # rates[0] = bar vừa đóng (oldest) ← dùng cái này
+                # rates[1] = bar đang mở (newest, chưa đóng) ← KHÔNG dùng
+                closed = rates[0]
                 # MT5 trả về time theo broker server local (ICMarkets = UTC+3)
                 # Phải trừ offset để convert về UTC thật
                 open_time = datetime.fromtimestamp(
