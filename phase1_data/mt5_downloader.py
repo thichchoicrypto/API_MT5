@@ -19,7 +19,7 @@ from typing import List, Optional
 from utils.logger import logger
 from config.settings import (
     MT5_ENABLED, MT5_LOGIN, MT5_PASSWORD, MT5_SERVER,
-    MT5_SYMBOL_MAP, MT5_TF_MAP, HISTORICAL_YEARS
+    MT5_SYMBOL_MAP, MT5_TF_MAP, HISTORICAL_YEARS, BROKER_TZ_OFFSET
 )
 from phase1_data.validator import validate_candles
 
@@ -92,12 +92,14 @@ class MT5Downloader:
 
         logger.info(f"MT5 downloading {symbol} {timeframe} from {start.date()} ...")
 
-        # MT5 copy_rates_range returns numpy array
+        # MT5 copy_rates_range nhận thời gian theo broker server local (ICMarkets = UTC+3)
+        # Phải cộng offset vào start/end trước khi pass vào MT5
+        broker_offset = timedelta(hours=BROKER_TZ_OFFSET)
         import numpy as np
         rates = mt5.copy_rates_range(
             mt5_symbol, tf_const,
-            start.replace(tzinfo=None),   # MT5 uses naive UTC
-            now.replace(tzinfo=None)
+            (start + broker_offset).replace(tzinfo=None),
+            (now + broker_offset).replace(tzinfo=None)
         )
 
         if rates is None or len(rates) == 0:
@@ -109,7 +111,8 @@ class MT5Downloader:
             candles.append({
                 "symbol":    symbol,
                 "timeframe": timeframe,
-                "open_time": datetime.fromtimestamp(r["time"], tz=timezone.utc),
+                # MT5 time = broker local (UTC+3) → convert về UTC thật
+                "open_time": datetime.fromtimestamp(r["time"] - BROKER_TZ_OFFSET * 3600, tz=timezone.utc),
                 "open":      float(r["open"]),
                 "high":      float(r["high"]),
                 "low":       float(r["low"]),

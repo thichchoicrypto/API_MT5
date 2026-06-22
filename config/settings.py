@@ -120,6 +120,11 @@ MT5_POLL_INTERVAL = float(os.getenv("MT5_POLL_INTERVAL", "5"))
 # STALE threshold: nếu không có bar mới trong N giây → reconnect
 STALE_CLOSED_BAR_THRESHOLD = 1500
 
+# Broker server UTC offset (ICMarkets = UTC+3 EEST summer, UTC+2 EET winter)
+# MT5 trả về candle time theo server local time, không phải UTC
+# Set BROKER_TZ_OFFSET=2 vào mùa đông (tháng 11 - tháng 3)
+BROKER_TZ_OFFSET = int(os.getenv("BROKER_TZ_OFFSET", "3"))
+
 # LIMIT order timeout (số candle)
 LIMIT_ORDER_TIMEOUT_CANDLES = int(os.getenv("LIMIT_ORDER_TIMEOUT_CANDLES", "3"))
 

@@ -19,7 +19,7 @@ from config.settings import (
     MT5_LOGIN, MT5_PASSWORD, MT5_SERVER, MT5_PATH,
     MT5_DEMO_MODE, MT5_SYMBOL_MAP, MT5_TF_MAP,
     MT5_POLL_INTERVAL, WS_RECONNECT_DELAY,
-    STALE_CLOSED_BAR_THRESHOLD,
+    STALE_CLOSED_BAR_THRESHOLD, BROKER_TZ_OFFSET,
 )
 from phase1_data.validator import validate_candle
 
@@ -102,8 +102,11 @@ class MT5StreamingCollector:
                     continue
 
                 closed = rates[1]   # bar[1] = last fully closed bar
+                # MT5 trả về time theo broker server local (ICMarkets = UTC+3)
+                # Phải trừ offset để convert về UTC thật
                 open_time = datetime.fromtimestamp(
-                    int(closed["time"]), tz=timezone.utc
+                    int(closed["time"]) - BROKER_TZ_OFFSET * 3600,
+                    tz=timezone.utc
                 )
 
                 last = self._last_bar_time.get(key)
