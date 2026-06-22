@@ -33,8 +33,10 @@ from utils.telegram import telegram
 MT5_EXE      = os.getenv("MT5_PATH", r"C:\Program Files\MetaTrader 5\terminal64.exe")
 BOT_SCRIPT   = r"C:\Projects\API_MT5\main.py"
 BOT_VENV     = r"C:\Projects\API_MT5\venv\Scripts\python.exe"
-CHECK_INTERVAL = 60   # giây
-MT5_STARTUP_WAIT = 15  # giây chờ MT5 khởi động xong
+BOT_LOG      = r"C:\Projects\API_MT5\logs\scalper.log"
+CHECK_INTERVAL   = 60    # giây
+MT5_STARTUP_WAIT = 15    # giây chờ MT5 khởi động xong
+BOT_HANG_TIMEOUT = 300   # giây — nếu log không update quá 5 phút → bot bị hang
 
 
 def is_process_running(name: str) -> bool:
@@ -53,6 +55,21 @@ def count_process(name: str) -> int:
         capture_output=True, text=True
     )
     return result.stdout.lower().count(name.lower())
+
+
+def kill_all_python():
+    """Kill tất cả python processes (dọn hung processes)."""
+    subprocess.run(["taskkill", "/F", "/IM", "python.exe"], capture_output=True)
+    time.sleep(3)
+
+
+def is_bot_alive() -> bool:
+    """Check bot có thực sự hoạt động không qua log file timestamp."""
+    log = Path(BOT_LOG)
+    if not log.exists():
+        return False
+    age = time.time() - log.stat().st_mtime
+    return age < BOT_HANG_TIMEOUT
 
 
 def start_mt5():
@@ -116,16 +133,24 @@ def main():
                     ))
 
             # ── Check Bot process ───────────────────────
-            # Watchdog itself is python.exe — cần >=2 python processes để bot đang chạy
-            if count_process("python.exe") < 2:
+            bot_dead    = count_process("python.exe") < 2
+            bot_hung    = not bot_dead and not is_bot_alive()
+
+            if bot_dead or bot_hung:
                 bot_restarts += 1
-                logger.warning(f"Bot not running! Restarting... (#{bot_restarts})")
+                reason = "crashed" if bot_dead else f"hung (log silent >{BOT_HANG_TIMEOUT}s)"
+                logger.warning(f"Bot {reason}! Restarting... (#{bot_restarts})")
+
+                if bot_hung:
+                    # Kill hung processes trước
+                    kill_all_python()
+
                 # Đảm bảo MT5 đang chạy trước khi start bot
                 if is_process_running("terminal64.exe"):
                     ok = start_bot()
                     if ok:
                         asyncio.run(send_alert(
-                            f"⚠️ Bot crashed — restarted (#{bot_restarts})"
+                            f"⚠️ Bot {reason} — restarted (#{bot_restarts})"
                         ))
                     else:
                         asyncio.run(send_alert(
