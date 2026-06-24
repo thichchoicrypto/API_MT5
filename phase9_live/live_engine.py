@@ -812,7 +812,7 @@ class LiveTradingEngine:
                         f"{icon} [LIVE] {status} {pos.side} {symbol}\n"
                         f"  Exit  : {exit_price:.5f}\n"
                         f"  P&L   : ${pnl:+.2f}\n"
-                        f"  Entry : {pos.entry_price:.5f}"
+                        f"  Entry : {pos.entry:.5f}"
                     )
                     logger.info(msg)
                     await telegram.send(msg)

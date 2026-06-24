@@ -369,6 +369,21 @@ class MT5OrderManager:
         return await self._run(_get)
 
     # ──────────────────────────────────────────────────────────
+    # GET CURRENT PRICE (bid/ask midpoint)
+    # ──────────────────────────────────────────────────────────
+    async def get_current_price(self, symbol: str) -> Optional[float]:
+        mt5     = _mt5()
+        mt5_sym = MT5_SYMBOL_MAP.get(symbol, symbol)
+
+        def _get():
+            tick = mt5.symbol_info_tick(mt5_sym)
+            if not tick:
+                return None
+            return (tick.bid + tick.ask) / 2.0
+
+        return await self._run(_get)
+
+    # ──────────────────────────────────────────────────────────
     # ACCOUNT BALANCE
     # ──────────────────────────────────────────────────────────
     async def get_account_balance(self) -> Optional[float]:
