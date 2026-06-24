@@ -13,14 +13,16 @@ from phase5_entry.trigger_detector import classify_trigger
 from utils.session_filter import is_trading_session, session_stop_reason
 
 # ADX threshold: below this = ranging market, skip trading
-# 28 (up from 25) — filters more low-quality ranging entries, reduces SL hits
-ADX_MIN_THRESHOLD = 28
+# 25 — compromise: filter hard ranging (< 20) but allow moderate trend (20-25)
+ADX_MIN_THRESHOLD = 25
 ADX_PERIOD = 14
 
 # Per-symbol ADX override — tighter filter for volatile/noisy pairs
 ADX_SYMBOL_OVERRIDE = {
-    "GBPUSD": 30,   # GBP more volatile, requires stronger trend confirmation
-    "GBPJPY": 30,   # GBP+JPY cross — double volatility, same stricter filter
+    # GBPUSD ADX=25 làm WR drop 49%→45%, PF 1.19→1.02 — giữ nguyên 30
+    "GBPUSD": 30,
+    "GBPJPY": 30,   # GBP+JPY cross — double volatility
+    "XAUUSD": 20,   # Gold trends at lower ADX; momentum-driven
 }
 
 
@@ -227,6 +229,26 @@ class EntryEngine:
             orig_trigger = trigger or self._pending[side]["trigger"]
             self.last_eval_debug["l5_trigger"] = orig_trigger
 
+            # L5b: Confirmation candle direction filter.
+            # MARKET entries: cần nến cùng chiều (close > open cho LONG).
+            # LIMIT entries (close > midpoint): miễn L5b — chính việc price pullback về
+            # midpoint sau này là confirmation đủ mạnh. Nến bearish nhưng trên zone OK.
+            zone_mid = entry_zone.get("midpoint", current["close"])
+            would_be_limit = (
+                (side == "LONG"  and current["close"] > zone_mid) or
+                (side == "SHORT" and current["close"] < zone_mid)
+            )
+            if not would_be_limit:
+                # MARKET entry: require candle close in trade direction
+                if side == "LONG" and current["close"] < current["open"]:
+                    self._reset_pending(side)
+                    self.last_eval_debug["stop_reason"] = "l5b_bearish_confirm"
+                    return None
+                if side == "SHORT" and current["close"] > current["open"]:
+                    self._reset_pending(side)
+                    self.last_eval_debug["stop_reason"] = "l5b_bullish_confirm"
+                    return None
+
         # ── Layer 6: Risk pre-check ───────────────────────────────────
         if risk_output and risk_output.get("rr", 0) < MIN_RR:
             logger.debug(f"[{self.symbol}] Rejected RR={risk_output.get('rr'):.2f}")
@@ -251,19 +273,39 @@ class EntryEngine:
         sweep = liquidity.get("last_sweep")
         choch = liquidity.get("last_choch")
 
+        # Per-symbol RANGE logic:
+        # XAUUSD + major FX pairs → OR (sweep OR CHOCH)
+        # JPY crosses (USDJPY, EURJPY, GBPJPY) → AND (sweep AND CHOCH): stricter filter needed
+        # OR logic for USDJPY caused WR to drop 51.5%→47%, DD explode to 37%, daily loss hit 17x
+        _AND_SYMBOLS = {"EURJPY", "GBPJPY", "USDJPY"}
+        use_or_logic = (self.symbol not in _AND_SYMBOLS)
+
         if side == "LONG":
-            trend_ok = trend in ("UP", "UPTREND") or mtf_bias == "LONG"
-            # RANGE: require BOTH sweep AND CHoCH for higher quality
-            range_ok = (trend == "RANGE"
-                        and sweep and sweep["type"] == "BUY_SIDE_SWEEP"
-                        and choch and choch["type"] == "BULLISH_CHOCH")
+            # AND logic: cả 15m trend VÀ 1h MTF bias đều phải LONG
+            # NEUTRAL bias: chỉ cần 15m trend UP (không có 1h confirmation rõ ràng)
+            if mtf_bias == "NEUTRAL":
+                trend_ok = trend in ("UP", "UPTREND")
+            else:
+                trend_ok = trend in ("UP", "UPTREND") and mtf_bias == "LONG"
+            range_sweep_ok = (trend == "RANGE"
+                              and sweep and sweep["type"] == "BUY_SIDE_SWEEP")
+            range_choch_ok = (trend == "RANGE"
+                              and choch and choch["type"] == "BULLISH_CHOCH")
+            range_ok = (range_sweep_ok or range_choch_ok) if use_or_logic \
+                       else (range_sweep_ok and range_choch_ok)
             return trend_ok or range_ok
 
         if side == "SHORT":
-            trend_ok = trend in ("DOWN", "DOWNTREND") or mtf_bias == "SHORT"
-            range_ok = (trend == "RANGE"
-                        and sweep and sweep["type"] == "SELL_SIDE_SWEEP"
-                        and choch and choch["type"] == "BEARISH_CHOCH")
+            if mtf_bias == "NEUTRAL":
+                trend_ok = trend in ("DOWN", "DOWNTREND")
+            else:
+                trend_ok = trend in ("DOWN", "DOWNTREND") and mtf_bias == "SHORT"
+            range_sweep_ok = (trend == "RANGE"
+                              and sweep and sweep["type"] == "SELL_SIDE_SWEEP")
+            range_choch_ok = (trend == "RANGE"
+                              and choch and choch["type"] == "BEARISH_CHOCH")
+            range_ok = (range_sweep_ok or range_choch_ok) if use_or_logic \
+                       else (range_sweep_ok and range_choch_ok)
             return trend_ok or range_ok
 
         return False

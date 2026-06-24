@@ -3,10 +3,10 @@ Phase 4.2–4.3 — Fair Value Gap (FVG) Detection and Scoring.
 """
 from typing import List, Optional, Dict
 import numpy as np
-from config.settings import FVG_MIN_ATR_RATIO
+from config.settings import FVG_MIN_ATR_RATIO, FVG_MIN_ATR_RATIO_OVERRIDE
 
 
-def detect_fvg(candles: List[dict]) -> List[Dict]:
+def detect_fvg(candles: List[dict], symbol: str = "EURUSD") -> List[Dict]:
     """
     Phase 4.2: Detect FVGs across a candle list.
     FVG = 3-candle pattern where there's a gap between C1 and C3.
@@ -30,7 +30,8 @@ def detect_fvg(candles: List[dict]) -> List[Dict]:
         return []
 
     atr = _calc_atr(candles)
-    min_size = atr * FVG_MIN_ATR_RATIO
+    _ratio = FVG_MIN_ATR_RATIO_OVERRIDE.get(symbol, FVG_MIN_ATR_RATIO)
+    min_size = atr * _ratio
     fvgs = []
 
     for i in range(len(candles) - 2):

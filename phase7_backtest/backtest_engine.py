@@ -6,11 +6,30 @@ Forex adaptations vs OKX version:
   - risk.evaluate() takes symbol as 2nd argument
   - _calc_pnl uses spread cost instead of exchange fees
   - No funding rates
+
+Backtest ↔ Live alignment:
+  CHG-BT-001  LIMIT simulation: không fill ngay, đợi giá chạm midpoint
+              ở candle sau. Giống live place_order(LIMIT) → chờ MT5 khớp.
+  CHG-BT-002  Same-candle re-entry blocked: sau khi đóng trade trên candle N
+              không mở ngay candle N (live: close là tick event, signal
+              chỉ fire candle N+1).
+  CHG-BT-003  Structure-based LIMIT cancellation (per limit_order_logic.md):
+              • Rule 1 — price closes beyond SL → structure_broken
+              • Rule 3 — price closes through entry zone → ob_invalidated
+              Time-based (LIMIT_ORDER_TIMEOUT_CANDLES) chỉ là safety fallback.
+  CHG-BT-004  Opposite-direction entries allowed while LIMIT pending:
+              • LIMIT pending chỉ block same-side (giống Live: có thể giữ 2 vị thế)
+              • LIMIT age luôn tăng mỗi candle, kể cả khi đang có open trade
+              • Không cho đặt 2 LIMIT đồng thời → skip LIMIT nếu đã có pending
+
+Note: order_type DB column là VARCHAR(10) — dùng "LMT_FILL" (8 ký tự)
+cho LIMIT đã khớp, không dùng "LIMIT_FILLED" (12 ký tự) để tránh truncate.
 """
 import random
 from typing import List, Dict, Optional, Callable
 from datetime import datetime
 from utils.logger import logger
+from config.settings import LIMIT_ORDER_TIMEOUT_CANDLES
 from phase2_structure.structure_engine import StructureEngine
 from phase2_structure.mtf_bias import MTFBias
 from phase3_liquidity.liquidity_engine import build_liquidity_zones
@@ -45,9 +64,10 @@ class BacktestTrade:
         self.exit_price: Optional[float] = None
         self.exit_time: Optional[datetime] = None
         self.pnl: float = 0.0
-        self.status: str = "OPEN"   # OPEN / TP / SL / CLOSED
+        self.status: str = "OPEN"   # OPEN / TP / SL / BE / CLOSED
         self.be_set: bool = False
         self.tp_index: int = 0
+        self.peak_price: float = entry_price   # track best price after entry (for trailing)
 
     def to_dict(self) -> Dict:
         return {
@@ -82,7 +102,7 @@ class BacktestEngine:
         # Entry timeframe engine
         self._structure = StructureEngine(symbol, timeframe)
         self._entry_engine = EntryEngine(symbol, timeframe)
-        self._risk = RiskEngine(initial_balance)
+        self._risk = RiskEngine(initial_balance, symbol=symbol)
         self._shift_tracker = StructureShiftTracker()
 
         # MTF: proper multi-timeframe structure engines
@@ -95,7 +115,15 @@ class BacktestEngine:
         self._idx_15m: int = 0
         self._idx_1h:  int = 0
 
-        self._open_trade: Optional[BacktestTrade] = None
+        # CHG-BT-006: Cho phép max 2 concurrent trades (AGGRESSIVE profile max_open_positions=2)
+        # Thay single _open_trade bằng list _open_trades
+        self._open_trades: List[BacktestTrade] = []
+        MAX_OPEN_POSITIONS = 2  # từ AGGRESSIVE profile
+        self._max_open = MAX_OPEN_POSITIONS
+        # CHG-BT-001: LIMIT pending state
+        # Khi entry_type == "LIMIT", không fill ngay — lưu vào đây,
+        # fill ở candle sau khi giá chạm midpoint.
+        self._pending_entry: Optional[Dict] = None
         self._trades: List[BacktestTrade] = []
         self._equity: List[Dict] = []
         self._fvgs: List[Dict] = []
@@ -242,10 +270,10 @@ class BacktestEngine:
                 "mtf_bias": mtf_bias,
             }
 
-            # FVG + OB
-            self._fvgs = detect_fvg(window[-30:])
+            # FVG + OB (pass symbol for per-symbol ATR ratio / OB lookback)
+            self._fvgs = detect_fvg(window[-30:], symbol=self.symbol)
             self._fvgs = update_fvg_fills(self._fvgs, current)
-            self._obs = detect_all_obs(window[-50:], struct.get("bos_events", []))
+            self._obs = detect_all_obs(window[-50:], struct.get("bos_events", []), symbol=self.symbol)
             self._obs = update_ob_mitigation(self._obs, current)
             confluence = find_confluence_zones(self._fvgs, self._obs)
 
@@ -253,22 +281,95 @@ class BacktestEngine:
             from phase4_fvg_ob.fvg_engine import _calc_atr
             atr = _calc_atr(window)
 
-            # Update open trade
-            if self._open_trade:
-                pnl = self._update_trade(self._open_trade, current)
+            # ── CHG-BT-001/003/004: Check pending LIMIT order ───────────────────
+            # Fill khi: LONG → low <= midpoint | SHORT → high >= midpoint
+            # CHG-BT-003 (limit_order_logic.md): hủy theo structure, không theo time:
+            #   Rule 1: close < sl (LONG) / close > sl (SHORT) → structure_broken
+            #   Rule 3: close < zone_low (LONG) / close > zone_high (SHORT) → ob_invalidated
+            # LIMIT_ORDER_TIMEOUT_CANDLES chỉ là safety fallback.
+            # CHG-BT-004a: age tăng mỗi candle, kể cả khi có open trade.
+            if self._pending_entry is not None:
+                self._pending_entry["age"] += 1
+
+            if self._pending_entry is not None and len(self._open_trades) < self._max_open:
+                pe  = self._pending_entry
+                mid = pe["entry_price"]
+                sl  = pe["risk_out"]["sl"]
+
+                filled = (
+                    (pe["side"] == "LONG"  and current["low"]  <= mid) or
+                    (pe["side"] == "SHORT" and current["high"] >= mid)
+                )
+                structure_broken = (
+                    (pe["side"] == "LONG"  and current["close"] < sl) or
+                    (pe["side"] == "SHORT" and current["close"] > sl)
+                )
+                zone_low  = pe.get("zone_low")
+                zone_high = pe.get("zone_high")
+                ob_invalidated = (
+                    (pe["side"] == "LONG"  and zone_low  is not None and current["close"] < zone_low) or
+                    (pe["side"] == "SHORT" and zone_high is not None and current["close"] > zone_high)
+                )
+                timed_out = pe["age"] >= LIMIT_ORDER_TIMEOUT_CANDLES
+
+                cancel_reason: Optional[str] = None
+
+                if filled:
+                    self._open_trades.append(BacktestTrade(
+                        pe["signal"], pe["risk_out"], mid, pe["signal_time"]
+                    ))
+                    if self.enable_tracker and pe.get("tracker"):
+                        pe["tracker"]["order_placed"] = True
+                        pe["tracker"]["entry_price"]  = mid
+                        pe["tracker"]["stop_reason"]  = None
+                        pe["tracker"]["order_type"]   = "LMT_FILL"  # VARCHAR(10) safe
+                        self._tracker_records.append(pe["tracker"])
+                    self._pending_entry = None
+                elif structure_broken:
+                    cancel_reason = "struct_break"
+                elif ob_invalidated:
+                    cancel_reason = "ob_invalid"
+                elif timed_out:
+                    cancel_reason = "lmt_timeout"
+
+                if cancel_reason:
+                    logger.debug(
+                        f"[{self.symbol}] LIMIT cancelled ({cancel_reason}) "
+                        f"age={pe['age']}"
+                    )
+                    if self.enable_tracker and pe.get("tracker"):
+                        pe["tracker"]["order_placed"] = False
+                        pe["tracker"]["stop_reason"]  = cancel_reason
+                        self._tracker_records.append(pe["tracker"])
+                    self._pending_entry = None
+
+            # ── CHG-BT-002: Update open trades + _just_closed flag ──────────────
+            # _just_closed ngăn re-entry cùng candle — giống live (close = tick event,
+            # signal mới chỉ fire candle tiếp theo).
+            _just_closed = False
+            for trade in list(self._open_trades):
+                pnl = self._update_trade(trade, current)
                 if pnl is not None:
                     balance += pnl
                     self._risk.register_pnl(pnl)
                     self._equity.append({"time": current["open_time"], "balance": balance})
-                    self._open_trade = None
+                    self._open_trades.remove(trade)
+                    _just_closed = True
 
             # News filter — skip signal nếu gần high-impact event
             if self._news_filter and self._news_filter.is_high_impact_window(current["open_time"]):
                 continue
 
-            # Check for new entry
-            if self._open_trade is None and self._risk.trading_enabled:
+            # ── Check for new entry ───────────────────────────────────────────────
+            # Điều kiện: không trade mở, candle này chưa đóng trade (CHG-BT-002),
+            # risk engine cho phép.
+            # CHG-BT-004b: Nếu LIMIT pending cho side X, vẫn cho phép check side Y
+            # (opposite direction MARKET — giống Live cho phép 2 vị thế).
+            _pending_side = self._pending_entry["side"] if self._pending_entry else None
+            if (len(self._open_trades) < self._max_open and not _just_closed and self._risk.trading_enabled):
                 for side in ("LONG", "SHORT"):
+                    if _pending_side is not None and side == _pending_side:
+                        continue  # CHG-BT-004b: skip — cùng direction với pending LIMIT
                     entry_zone = build_entry_zone(side, self._fvgs, self._obs, confluence,
                                                   current_price=current_price, atr=atr)
 
@@ -325,7 +426,6 @@ class BacktestEngine:
                         "stop_reason":   dbg.get("stop_reason"),
                     })
 
-                    # eligible = True khi pass đủ l1-l6 (kể cả awaiting confirm)
                     all_pass = (
                         dbg.get("l1_trend") is True and
                         dbg.get("l2_zone_touch") is True and
@@ -337,42 +437,86 @@ class BacktestEngine:
                     tracker["eligible"] = all_pass
 
                     if signal:
-                        # Skip zero-size trades
                         if not risk_out.get("position_size") or risk_out["position_size"] <= 0:
                             tracker["stop_reason"] = "zero_size"
                             if self.enable_tracker:
                                 self._tracker_records.append(tracker)
                             continue
-                        # Phase 7.7: slippage
-                        raw_price = entry_zone["midpoint"]
-                        slip = raw_price * self.slippage * (1 if side == "LONG" else -1)
-                        entry_price = raw_price + slip
-                        self._open_trade = BacktestTrade(signal, risk_out, entry_price, current["open_time"])
 
-                        tracker.update({
-                            "signal_side":  side,
-                            "order_placed": True,
-                            "order_type":   signal.get("entry_type", "MARKET"),
-                            "entry_price":  entry_price,
-                            "stop_reason":  None,
-                            "eligible":     True,
-                        })
-                        if self.enable_tracker:
-                            self._tracker_records.append(tracker)
+                        raw_price  = entry_zone["midpoint"]
+                        slip       = raw_price * self.slippage * (1 if side == "LONG" else -1)
+                        entry_price = raw_price + slip
+                        entry_type  = signal.get("entry_type", "MARKET")
+
+                        if entry_type == "LIMIT":
+                            # CHG-BT-004c: Không đặt 2 LIMIT đồng thời
+                            # (pending_side đã được filter ở trên nên đây là opposite side,
+                            # nhưng vẫn check phòng edge case)
+                            if self._pending_entry is not None:
+                                tracker["stop_reason"] = "lmt_already_pending"
+                                if self.enable_tracker:
+                                    self._tracker_records.append(tracker)
+                                break
+                            # CHG-BT-001: LIMIT — không fill ngay, đặt pending
+                            self._pending_entry = {
+                                "signal":      signal,
+                                "risk_out":    risk_out,
+                                "entry_price": entry_price,
+                                "side":        side,
+                                "age":         0,
+                                "signal_time": current["open_time"],
+                                "zone_low":    entry_zone["low"],   # CHG-BT-003
+                                "zone_high":   entry_zone["high"],  # CHG-BT-003
+                                "tracker":     None,
+                            }
+                            tracker.update({
+                                "signal_side":  side,
+                                "order_placed": False,
+                                "order_type":   "LIMIT",
+                                "entry_price":  entry_price,
+                                "stop_reason":  "lmt_pending",
+                                "eligible":     True,
+                            })
+                            # Không append ngay — append khi fill/cancel
+                            self._pending_entry["tracker"] = dict(tracker)
+                        else:
+                            # MARKET — fill ngay
+                            self._open_trades.append(BacktestTrade(signal, risk_out, entry_price, current["open_time"]))
+                            tracker.update({
+                                "signal_side":  side,
+                                "order_placed": True,
+                                "order_type":   "MARKET",
+                                "entry_price":  entry_price,
+                                "stop_reason":  None,
+                                "eligible":     True,
+                            })
+                            if self.enable_tracker:
+                                self._tracker_records.append(tracker)
+
                         break
                     else:
                         if self.enable_tracker:
                             self._tracker_records.append(tracker)
 
-        # Close any remaining open trade at last price
-        if self._open_trade:
+        # Close any remaining open trades at last price
+        for trade in self._open_trades:
             last = candles[-1]
-            self._open_trade.exit_price = last["close"]
-            self._open_trade.exit_time = last["open_time"]
-            self._open_trade.status = "CLOSED"
-            pnl = self._calc_pnl(self._open_trade)
-            self._open_trade.pnl = pnl
-            self._trades.append(self._open_trade)
+            trade.exit_price = last["close"]
+            trade.exit_time = last["open_time"]
+            trade.status = "CLOSED"
+            pnl = self._calc_pnl(trade)
+            trade.pnl = pnl
+            self._trades.append(trade)
+        self._open_trades.clear()
+
+        # Discard unfilled LIMIT pending khi hết data
+        if self._pending_entry is not None:
+            if self.enable_tracker and self._pending_entry.get("tracker"):
+                t = self._pending_entry["tracker"]
+                t["order_placed"] = False
+                t["stop_reason"]  = "lmt_eob"
+                self._tracker_records.append(t)
+            self._pending_entry = None
 
         # Update tracker records with trade outcomes
         if self.enable_tracker:
@@ -405,51 +549,86 @@ class BacktestEngine:
         sl_dist = abs(entry - sl)
 
         if side == "LONG":
-            # Breakeven: when candle high reaches entry + 1R, move SL to entry
+            # Track peak price (for trailing stop after BE)
+            if candle["high"] > trade.peak_price:
+                trade.peak_price = candle["high"]
+
+            # Breakeven: move SL to entry at 1R
+            # 0.7R was too aggressive — XAUUSD pullbacks often touch entry after 0.7R
+            # causing TP trades to exit at BE instead of reaching 2R.
             if not trade.be_set and candle["high"] >= entry + sl_dist:
                 trade.sl = entry
                 trade.be_set = True
                 sl = trade.sl
 
-            # SL hit
-            if candle["low"] <= sl:
-                trade.exit_price = sl
-                trade.exit_time = candle["open_time"]
-                trade.status = "BE" if trade.be_set and sl == entry else "SL"
+            # Trailing stop: after BE (1R), when peak reaches 1.3R → trail SL to peak - 0.4R
+            # 1.3R activation: sweet spot — captures reversal without early-exiting TP runs
+            if trade.be_set and trade.peak_price >= entry + sl_dist * 1.3:
+                trail_level = trade.peak_price - sl_dist * 0.4
+                if trail_level > trade.sl:
+                    trade.sl = trail_level
+                    sl = trade.sl
+
+            # TP hit first — check before SL to prioritise full target
+            if tps and candle["high"] >= tps[trade.tp_index]["level"]:
+                trade.exit_price = tps[trade.tp_index]["level"]
+                trade.exit_time  = candle["open_time"]
+                trade.status = "TP"
                 trade.pnl = self._calc_pnl(trade)
                 self._trades.append(trade)
                 return trade.pnl
 
-            # TP hit
-            if tps and candle["high"] >= tps[trade.tp_index]["level"]:
-                trade.exit_price = tps[trade.tp_index]["level"]
-                trade.exit_time = candle["open_time"]
-                trade.status = "TP"
+            # SL hit (original SL, BE at entry, or trailing stop above entry)
+            if candle["low"] <= sl:
+                trade.exit_price = sl
+                trade.exit_time  = candle["open_time"]
+                if sl > entry:
+                    trade.status = "TP"   # trailing stop above entry = profit
+                elif trade.be_set and sl == entry:
+                    trade.status = "BE"
+                else:
+                    trade.status = "SL"
                 trade.pnl = self._calc_pnl(trade)
                 self._trades.append(trade)
                 return trade.pnl
 
         elif side == "SHORT":
-            # Breakeven: when candle low reaches entry - 1R, move SL to entry
+            # Track peak price (SHORT: favorable direction is DOWN, track lowest)
+            if candle["low"] < trade.peak_price:
+                trade.peak_price = candle["low"]
+
+            # Breakeven at 1R
             if not trade.be_set and candle["low"] <= entry - sl_dist:
                 trade.sl = entry
                 trade.be_set = True
                 sl = trade.sl
 
-            # SL hit
-            if candle["high"] >= sl:
-                trade.exit_price = sl
-                trade.exit_time = candle["open_time"]
-                trade.status = "BE" if trade.be_set and sl == entry else "SL"
+            # Trailing stop: after BE (1R), when peak reaches 1.3R → trail SL to peak + 0.4R
+            if trade.be_set and trade.peak_price <= entry - sl_dist * 1.3:
+                trail_level = trade.peak_price + sl_dist * 0.4
+                if trail_level < trade.sl:
+                    trade.sl = trail_level
+                    sl = trade.sl
+
+            # TP hit first (full 2R)
+            if tps and candle["low"] <= tps[trade.tp_index]["level"]:
+                trade.exit_price = tps[trade.tp_index]["level"]
+                trade.exit_time  = candle["open_time"]
+                trade.status = "TP"
                 trade.pnl = self._calc_pnl(trade)
                 self._trades.append(trade)
                 return trade.pnl
 
-            # TP hit
-            if tps and candle["low"] <= tps[trade.tp_index]["level"]:
-                trade.exit_price = tps[trade.tp_index]["level"]
-                trade.exit_time = candle["open_time"]
-                trade.status = "TP"
+            # SL hit (original, BE, or trailing stop below entry)
+            if candle["high"] >= sl:
+                trade.exit_price = sl
+                trade.exit_time  = candle["open_time"]
+                if sl < entry:
+                    trade.status = "TP"   # trailing stop below entry = profit
+                elif trade.be_set and sl == entry:
+                    trade.status = "BE"
+                else:
+                    trade.status = "SL"
                 trade.pnl = self._calc_pnl(trade)
                 self._trades.append(trade)
                 return trade.pnl
@@ -459,15 +638,31 @@ class BacktestEngine:
     def _calc_pnl(self, trade: BacktestTrade) -> float:
         """Phase 7.8: Forex PnL.
         No exchange fees — cost is bid/ask spread at entry (~1 pip).
-        PnL = (exit - entry) × direction × units - spread_cost
+        Full exit at TP (2R) or SL/BE. No partial exit.
+
+        USD-quote pairs (EURUSD, GBPUSD, XAUUSD …):
+          gross = price_change × units   (already in USD)
+          spread_cost = entry × SPREAD_COST_PCT × units
+
+        Non-USD-quote pairs (USDJPY, EURJPY, USDCAD …):
+          price_change is in quote currency → convert: gross = price_change × units / entry
+          spread_cost = SPREAD_COST_PCT × units   (~1 pip in USD terms)
         """
         if trade.exit_price is None:
             return 0.0
+        symbol = trade.signal.get("symbol", "EURUSD")
         direction = 1 if trade.side == "LONG" else -1
-        gross = (trade.exit_price - trade.entry_price) * direction * trade.position_size
-        # Spread cost: 1 pip at entry price per lot
-        spread_cost = trade.entry_price * SPREAD_COST_PCT * trade.position_size
-        return gross - spread_cost
+        price_change = (trade.exit_price - trade.entry_price) * direction
+
+        _USD_QUOTE = {"EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "EURGBP", "XAUUSD", "XAGUSD"}
+        if symbol not in _USD_QUOTE and trade.entry_price > 0:
+            gross = price_change * trade.position_size / trade.entry_price
+            spread_cost = SPREAD_COST_PCT * trade.position_size
+        else:
+            gross = price_change * trade.position_size
+            spread_cost = trade.entry_price * SPREAD_COST_PCT * trade.position_size
+
+        return round(gross - spread_cost, 4)
 
     def _compute_results(self) -> Dict:
         """Phase 7.10: Performance metrics."""

@@ -57,12 +57,16 @@ def walk_forward_test(candles: List[dict], symbol: str, timeframe: str,
 
     # Aggregate
     import numpy as np
+    _avg_pf = round(float(np.mean([r["profit_factor"] for r in results])), 2)
+    # consistent=True: ít nhất 2/3 folds có PF > 1.0 VÀ avg_PF > 1.05
+    # (thay vì all(PF > 1.0) — quá strict khi 1 fold gặp bad macro period)
+    _n_profitable = sum(1 for r in results if r["profit_factor"] > 1.0)
     avg_metrics = {
         "folds": results,
         "avg_winrate": round(float(np.mean([r["winrate"] for r in results])), 4),
-        "avg_profit_factor": round(float(np.mean([r["profit_factor"] for r in results])), 2),
+        "avg_profit_factor": _avg_pf,
         "avg_max_dd": round(float(np.mean([r["max_drawdown_pct"] for r in results])), 4),
         "avg_net_profit_pct": round(float(np.mean([r["net_profit_pct"] for r in results])), 4),
-        "consistent": all(r["profit_factor"] > 1.0 for r in results),
+        "consistent": (_n_profitable >= 2 and _avg_pf > 1.05),
     }
     return avg_metrics

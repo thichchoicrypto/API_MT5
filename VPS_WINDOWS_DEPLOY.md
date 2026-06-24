@@ -294,10 +294,35 @@ python3 main.py backtest
 | `database "mt5_scalper_mac" does not exist` after git stash pop | stash restored old .env with wrong DB_NAME | Run: `(Get-Content .env) -replace 'mt5_scalper_mac','mt5_scalper_db' \| Set-Content .env` |
 | New symbols not exported (NZDUSD/USDCHF/GBPJPY missing) | export ran before `git pull` updated SYMBOLS list | Re-run export after pull: `python tools/export_candles.py --dir export_data` then add/commit/push specific CSV files |
 | `git commit` fails with "unmerged files" on logs | Log files stuck in unmerged state from failed stash | `git rm --cached logs/scalper.log logs/scalper_errors.log` to remove from index, then commit |
+| Tasks không chạy sau reboot (`LastRunTime = 1999`) | Windows chưa có user session khi tasks fire | Bật auto-login registry (xem **Auto-Start → Bước 0**) |
+| Telegram không báo sau reboot dù tasks đã set | MT5 Terminal cần desktop GUI — không có auto-login thì không có session | Bật auto-login, reboot lại, kiểm tra `LastRunTime` |
 
 ---
 
 ## Auto-Start with Task Scheduler
+
+### Bước 0 — Bật Auto-Login (BẮT BUỘC)
+
+MT5 Terminal cần interactive desktop session để mở được GUI. Nếu không có auto-login, tasks sẽ không chạy được sau reboot (LastRunTime = 1999-11-30).
+
+```powershell
+$RegPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+Set-ItemProperty $RegPath "AutoAdminLogon"  -Value "1"             -Type String
+Set-ItemProperty $RegPath "DefaultUsername" -Value "Administrator" -Type String
+Set-ItemProperty $RegPath "DefaultPassword" -Value "YOUR_VPS_PASSWORD" -Type String
+```
+
+Verify:
+```powershell
+Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" | Select AutoAdminLogon, DefaultUsername
+# Phải thấy: AutoAdminLogon = 1
+```
+
+> Sau khi set xong, reboot VPS — Windows sẽ tự login Administrator mà không cần RDP. Tasks sẽ fire trong interactive session và Telegram sẽ nhận được thông báo.
+
+---
+
+### Bước 1 — Tạo 3 Tasks
 
 Add **3 tasks** in order (all: Run whether user is logged on or not):
 
@@ -312,6 +337,71 @@ Steps for each task:
 2. Trigger: **At startup** → set delay in "Advanced settings"
 3. Action: **Start a program** → fill Program + Arguments + Start in (`C:\Projects\API_MT5`)
 4. Check ✅ **Run whether user is logged on or not**
+
+### Bước 2 — Gán credentials cho tasks
+
+```powershell
+$p = Read-Host "VPS Password" -AsSecureString
+$plain = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
+    [Runtime.InteropServices.Marshal]::SecureStringToBSTR($p))
+Set-ScheduledTask -TaskName "MT5_Terminal" -User "Administrator" -Password $plain
+Set-ScheduledTask -TaskName "MT5_Bot"      -User "Administrator" -Password $plain
+Set-ScheduledTask -TaskName "MT5_Watchdog" -User "Administrator" -Password $plain
+```
+
+### Kiểm tra sau reboot
+
+```powershell
+Get-ScheduledTaskInfo -TaskName "MT5_Bot"      | Select LastRunTime, LastTaskResult
+Get-ScheduledTaskInfo -TaskName "MT5_Watchdog" | Select LastRunTime, LastTaskResult
+```
+
+> `LastTaskResult = 0` = thành công. `LastRunTime = 1999` = chưa chạy lần nào (auto-login chưa hoạt động).
+
+---
+
+## Test Orders (tools/test_orders.py)
+
+Script test đặt MARKET + LIMIT order rồi tự cancel sau 60s.
+
+```powershell
+# PHẢI stop bot trước — bot đang chạy sẽ giữ MT5 connection → test bị lỗi retcode=10027
+Stop-ScheduledTask -TaskName "MT5_Watchdog"
+Stop-ScheduledTask -TaskName "MT5_Bot"
+Stop-Process -Name python -Force -ErrorAction SilentlyContinue
+Start-Sleep 3
+
+# Chạy test
+cd C:\Projects\API_MT5
+venv\Scripts\activate
+python tools/test_orders.py
+```
+
+Sau khi test xong, start lại bot:
+```powershell
+Start-ScheduledTask -TaskName "MT5_Bot"
+Start-Sleep 15
+Start-ScheduledTask -TaskName "MT5_Watchdog"
+```
+
+> **Lưu ý:** Nếu gặp `retcode=10027 AutoTrading disabled` — restart MT5 Terminal rồi đảm bảo nút **Algo Trading** đang bật (■ đỏ trên toolbar).
+
+---
+
+## Stop All (Emergency)
+
+```powershell
+# Stop tất cả tasks
+Stop-ScheduledTask -TaskName "MT5_Watchdog"
+Stop-ScheduledTask -TaskName "MT5_Bot"
+Stop-ScheduledTask -TaskName "MT5_Terminal"
+
+# Kill processes nếu vẫn còn chạy
+Stop-Process -Name "python" -Force -ErrorAction SilentlyContinue
+Stop-Process -Name "terminal64" -Force -ErrorAction SilentlyContinue
+```
+
+> **Lưu ý:** Stop Watchdog **trước** — nếu stop Bot trước, Watchdog sẽ tự restart bot lại ngay.
 
 ---
 

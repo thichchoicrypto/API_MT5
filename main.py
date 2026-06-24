@@ -149,7 +149,8 @@ async def run_download(extra_symbols: list = None):
 async def run_backtest(symbol: str = "EURUSD", timeframe: str = "1h",
                        limit: int = 210_000, offset: int = 0,
                        use_news_filter: bool = False,
-                       from_date: str = None, to_date: str = None):
+                       from_date: str = None, to_date: str = None,
+                       initial_balance: float = 10_000.0):
     """Phase 7: Run event-driven backtest on historical data."""
     from datetime import datetime, timezone, timedelta
     from phase1_data.database import Database
@@ -214,7 +215,17 @@ async def run_backtest(symbol: str = "EURUSD", timeframe: str = "1h",
         await nf.refresh(days_back=365 * 2, days_ahead=0)
         logger.info(f"News filter ready: {nf.event_count} US high-impact events")
 
+    # Truncate backtest tracker before each run to avoid mixing stale data
+    # (UPSERT on (symbol, timeframe, candle_time, side) can mix old & new runs)
+    try:
+        async with db.pool.acquire() as conn:
+            await conn.execute("TRUNCATE TABLE candle_tracker_backtest")
+        logger.info("candle_tracker_backtest truncated ✅")
+    except Exception as e:
+        logger.warning(f"Could not truncate candle_tracker_backtest: {e}")
+
     engine = BacktestEngine(symbol, timeframe,
+                            initial_balance=initial_balance,
                             candles_15m=candles_15m,
                             candles_1h=candles_1h,
                             enable_tracker=True,
@@ -238,7 +249,7 @@ async def run_backtest(symbol: str = "EURUSD", timeframe: str = "1h",
     print(f"  {'PASSED':<25}: {'✅ YES' if results.get('passed') else '❌ NO'}")
     print("═" * 50)
 
-    _print_quarterly_breakdown(engine.trades, engine.equity_curve, 5_000.0)
+    _print_quarterly_breakdown(engine.trades, engine.equity_curve, engine.initial_balance)
 
     logger.info("Running walk-forward validation ...")
     wf = walk_forward_test(candles, symbol, timeframe,
@@ -258,7 +269,8 @@ async def run_backtest(symbol: str = "EURUSD", timeframe: str = "1h",
 
 async def run_backtest_multi(symbols: list, timeframe: str,
                              limit: int = 210_000, offset: int = 0,
-                             from_date: str = None, to_date: str = None):
+                             from_date: str = None, to_date: str = None,
+                             initial_balance: float = 5_000.0):
     """Chạy backtest cho nhiều symbol trên cùng $10k."""
     from datetime import datetime, timezone, timedelta
     from phase1_data.database import Database
@@ -271,7 +283,7 @@ async def run_backtest_multi(symbols: list, timeframe: str,
     if to_date:
         _to_dt = datetime.fromisoformat(to_date).replace(tzinfo=timezone.utc)
 
-    INITIAL = 5_000.0
+    INITIAL = initial_balance
     db = Database()
     await db.connect()
 
@@ -751,6 +763,8 @@ def main():
                         help="Backtest từ ngày (ISO: 2025-01-01)")
     parser.add_argument("--to",     dest="to_date",   default=None,
                         help="Backtest đến ngày (ISO: 2025-12-31)")
+    parser.add_argument("--balance", default=None, type=float,
+                        help="Initial balance cho backtest (default: 10000 single / 5000 multi)")
     parser.add_argument("--news-filter", action="store_true")
     args = parser.parse_args()
 
@@ -768,12 +782,16 @@ def main():
         limit   = args.limit if args.limit != 2000 else 210_000
         symbols = [s.strip() for s in args.symbol.split(",")]
         if len(symbols) > 1:
+            bal = args.balance if args.balance is not None else 5_000.0
             asyncio.run(run_backtest_multi(symbols, args.tf, limit=limit, offset=args.offset,
-                                           from_date=args.from_date, to_date=args.to_date))
+                                           from_date=args.from_date, to_date=args.to_date,
+                                           initial_balance=bal))
         else:
+            bal = args.balance if args.balance is not None else 10_000.0
             asyncio.run(run_backtest(symbols[0], args.tf, limit=limit, offset=args.offset,
                                      use_news_filter=args.news_filter,
-                                     from_date=args.from_date, to_date=args.to_date))
+                                     from_date=args.from_date, to_date=args.to_date,
+                                     initial_balance=bal))
 
     elif args.mode == "paper":
         asyncio.run(run_paper())

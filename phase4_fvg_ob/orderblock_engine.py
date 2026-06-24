@@ -3,10 +3,10 @@ Phase 4.4 — Order Block Detection.
 OB = last opposing candle before a strong BOS move.
 """
 from typing import List, Optional, Dict
-from config.settings import OB_LOOKBACK
+from config.settings import OB_LOOKBACK, OB_LOOKBACK_OVERRIDE
 
 
-def detect_order_block(candles: List[dict], bos_index: int, bos_type: str) -> Optional[Dict]:
+def detect_order_block(candles: List[dict], bos_index: int, bos_type: str, symbol: str = "EURUSD") -> Optional[Dict]:
     """
     Phase 4.4: Find the last bearish candle before a bullish BOS (Bullish OB)
     or the last bullish candle before a bearish BOS (Bearish OB).
@@ -25,7 +25,8 @@ def detect_order_block(candles: List[dict], bos_index: int, bos_type: str) -> Op
     Nến bearish gần BOS nhất = đợt bán cuối cùng trước khi smart money đẩy giá.
     Đây là điểm tổ chức vừa tích lũy xong → mạnh nhất.
     """
-    start = max(0, bos_index - OB_LOOKBACK)
+    _lookback = OB_LOOKBACK_OVERRIDE.get(symbol, OB_LOOKBACK)
+    start = max(0, bos_index - _lookback)
 
     if bos_type == "BOS_UP":
         # Look back for last bearish candle → Bullish OB
@@ -58,7 +59,7 @@ def detect_order_block(candles: List[dict], bos_index: int, bos_type: str) -> Op
     return None
 
 
-def detect_all_obs(candles: List[dict], bos_events: List[Dict]) -> List[Dict]:
+def detect_all_obs(candles: List[dict], bos_events: List[Dict], symbol: str = "EURUSD") -> List[Dict]:
     """Detect OBs for all BOS events in the list."""
     obs = []
     for bos in bos_events:
@@ -66,7 +67,7 @@ def detect_all_obs(candles: List[dict], bos_events: List[Dict]) -> List[Dict]:
         bos_idx = _find_candle_index(candles, bos.get("time"))
         if bos_idx is None:
             continue
-        ob = detect_order_block(candles, bos_idx, bos["type"])
+        ob = detect_order_block(candles, bos_idx, bos["type"], symbol=symbol)
         if ob:
             obs.append(ob)
     return obs

@@ -378,10 +378,10 @@ class LiveTradingEngine:
                 "mtf_bias": _mtf_bias,
             }
 
-            # Phase 4: FVG + OB
-            self._fvgs[symbol] = detect_fvg(candles[-30:])
+            # Phase 4: FVG + OB (pass symbol for per-symbol ATR ratio / OB lookback)
+            self._fvgs[symbol] = detect_fvg(candles[-30:], symbol=symbol)
             self._fvgs[symbol] = update_fvg_fills(self._fvgs[symbol], candles[-1])
-            self._obs[symbol] = detect_all_obs(candles[-50:], struct.get("bos_events", []))
+            self._obs[symbol] = detect_all_obs(candles[-50:], struct.get("bos_events", []), symbol=symbol)
             self._obs[symbol] = update_ob_mitigation(self._obs[symbol], candles[-1])
             confluence = find_confluence_zones(self._fvgs[symbol], self._obs[symbol])
 

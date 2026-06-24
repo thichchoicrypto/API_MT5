@@ -33,9 +33,9 @@ SESSIONS = {
 # Active hours per symbol (UTC)
 # Format: (start_hour, end_hour) — trade ONLY within this window
 SYMBOL_SESSIONS = {
-    # EURUSD: removed from AGGRESSIVE — consistently PF < 1.5 with this strategy
-    "EURUSD": (8,  22),
-    # GBPUSD: London session only (08-17 UTC) — avoids late NY noise, more trades than overlap
+    # EURUSD: London pre-open included (07:00) — active period before official open
+    "EURUSD": (7,  22),
+    # GBPUSD: London only (08-17 UTC) — NY session adds noise for GBP, hurts WF consistency
     "GBPUSD": (8,  17),
     "EURGBP": (8,  22),
     "EURJPY": (8,  22),
@@ -48,8 +48,8 @@ SYMBOL_SESSIONS = {
     "NZDUSD": (8,  22),
     "USDCAD": (13, 22),   # most active NY session
     "USDCHF": (8,  22),
-    # Gold: London + NY
-    "XAUUSD": (8,  22),
+    # Gold: London + NY + Asian (China/India gold market active 00:00-08:00 UTC)
+    "XAUUSD": (0,  22),
     "XAGUSD": (8,  22),
 }
 

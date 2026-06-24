@@ -19,7 +19,9 @@ import numpy as np
 from utils.logger import logger
 from config.settings import (
     RISK_PER_TRADE, MAX_DAILY_LOSS, MAX_DRAWDOWN,
-    MIN_RR, SL_BUFFER, MAX_LEVERAGE, PIP_SIZE
+    MIN_RR, SL_BUFFER, MAX_LEVERAGE, PIP_SIZE,
+    RISK_PER_TRADE_OVERRIDE, TP_MULTIPLIERS_OVERRIDE, MIN_RR_OVERRIDE,
+    CONSECUTIVE_LOSS_LIMIT, CONSECUTIVE_LOSS_LIMIT_OVERRIDE
 )
 
 
@@ -60,13 +62,15 @@ class ForexRiskEngine:
     Replaces OKX RiskEngine for Forex project.
     """
 
-    def __init__(self, account_balance: float = 10_000.0):
+    def __init__(self, account_balance: float = 10_000.0, symbol: str = "EURUSD"):
         self.account_balance = account_balance
+        self.symbol = symbol
         self.daily_pnl: float = 0.0
         self.peak_balance: float = account_balance
         self._day_start_balance: float = account_balance
         self.trading_enabled: bool = True
         self._consecutive_losses: int = 0
+        self._consec_limit: int = CONSECUTIVE_LOSS_LIMIT_OVERRIDE.get(symbol, CONSECUTIVE_LOSS_LIMIT)
 
     # ─────────────────────────────────────────
     # SL CALCULATION
@@ -121,10 +125,11 @@ class ForexRiskEngine:
     # TP CALCULATION
     # ─────────────────────────────────────────
     def calc_tp(self, side: str, entry: float, sl: float,
-                liquidity_zones: List[Dict]) -> List[Dict]:
+                liquidity_zones: List[Dict], symbol: str = "EURUSD") -> List[Dict]:
         """
-        Multi-level TP: TP1=2R, TP2=2.5R or liquidity, TP3=4R or liquidity.
-        Split: 50% / 30% / 20%.
+        Multi-level TP with per-symbol multipliers.
+        Default: TP1=2R, TP2=2.5R, TP3=4R. Split: 50%/30%/20%.
+        Override via TP_MULTIPLIERS_OVERRIDE in settings.
         """
         sl_dist = abs(entry - sl)
         if sl_dist <= 0:
@@ -132,30 +137,31 @@ class ForexRiskEngine:
 
         tps = []
         sizes = [0.5, 0.3, 0.2]
+        _r1, _r2, _r3 = TP_MULTIPLIERS_OVERRIDE.get(symbol, (2.0, 2.5, 4.0))
 
-        tp1 = entry + sl_dist * 2.0 if side == "LONG" else entry - sl_dist * 2.0
-        tps.append({"level": round(tp1, 6), "rr": 2.0, "size_ratio": sizes[0]})
+        tp1 = entry + sl_dist * _r1 if side == "LONG" else entry - sl_dist * _r1
+        tps.append({"level": round(tp1, 6), "rr": _r1, "size_ratio": sizes[0]})
 
         liq_tps = _find_liquidity_targets(side, entry, liquidity_zones)
         liq2 = next((lvl for lvl in liq_tps
-                     if abs(lvl - entry) / sl_dist >= 2.0), None)
+                     if abs(lvl - entry) / sl_dist >= _r1), None)
         if liq2:
             tps.append({"level": round(liq2, 6),
                         "rr": round(abs(liq2 - entry) / sl_dist, 2),
                         "size_ratio": sizes[1]})
         else:
-            tp2 = entry + sl_dist * 2.5 if side == "LONG" else entry - sl_dist * 2.5
-            tps.append({"level": round(tp2, 6), "rr": 2.5, "size_ratio": sizes[1]})
+            tp2 = entry + sl_dist * _r2 if side == "LONG" else entry - sl_dist * _r2
+            tps.append({"level": round(tp2, 6), "rr": _r2, "size_ratio": sizes[1]})
 
         liq3 = next((lvl for lvl in liq_tps
-                     if abs(lvl - entry) / sl_dist >= 3.5), None)
+                     if abs(lvl - entry) / sl_dist >= (_r2 + 1.0)), None)
         if liq3:
             tps.append({"level": round(liq3, 6),
                         "rr": round(abs(liq3 - entry) / sl_dist, 2),
                         "size_ratio": sizes[2]})
         else:
-            tp3 = entry + sl_dist * 4.0 if side == "LONG" else entry - sl_dist * 4.0
-            tps.append({"level": round(tp3, 6), "rr": 4.0, "size_ratio": sizes[2]})
+            tp3 = entry + sl_dist * _r3 if side == "LONG" else entry - sl_dist * _r3
+            tps.append({"level": round(tp3, 6), "rr": _r3, "size_ratio": sizes[2]})
 
         return tps
 
@@ -163,27 +169,28 @@ class ForexRiskEngine:
     # POSITION SIZING — OANDA UNITS
     # ─────────────────────────────────────────
     def calc_position_size(self, symbol: str, entry: float, sl: float,
-                            risk_pct: float = RISK_PER_TRADE) -> float:
+                            risk_pct: float = None) -> float:
         """
         Position size in OANDA units.
 
-        Formula:
-          risk_amount = account_balance × risk_pct
-          sl_pips = |entry - sl| / pip_size
-          pip_value_per_unit = pip_size × 1   (for USD-quote pairs like EURUSD)
-          units = risk_amount / (sl_pips × pip_value_per_unit)
+        USD-quote pairs (EURUSD, GBPUSD, XAUUSD, …):
+          units = risk_amount / sl_distance
+          (sl_distance already in USD → direct division)
 
-        Simplified for USD-account, USD-quote pairs:
-          units = risk_amount / |entry - sl|
-
-        This is identical to OKX formula — works because OANDA units are
-        directly priced in the quote currency (USD for most majors).
+        Non-USD-quote pairs (USDJPY, EURJPY, GBPJPY, USDCAD, USDCHF, …):
+          sl_distance is in quote currency (JPY, CAD, CHF)
+          Must scale by entry rate to get USD-equivalent:
+          units = (risk_amount × entry) / sl_distance
+          E.g. USDJPY@150, 15-pip SL: units = (200×150)/0.15 = 200,000
 
         Safety:
           - Minimum SL distance = 3 pips
           - Maximum units = account × MAX_LEVERAGE / entry
           - Round to nearest unit
         """
+        if risk_pct is None:
+            risk_pct = RISK_PER_TRADE_OVERRIDE.get(symbol, RISK_PER_TRADE)
+
         if sl <= 0 or entry <= 0 or self.account_balance <= 0:
             return 0.0
 
@@ -196,10 +203,20 @@ class ForexRiskEngine:
             return 0.0
 
         risk_amount = self.account_balance * risk_pct
-        units = risk_amount / sl_distance
 
-        # Cap: no more than MAX_LEVERAGE × balance notional
-        max_units = (self.account_balance * MAX_LEVERAGE) / entry
+        # Pairs where quote currency ≠ USD → scale by entry price
+        _USD_QUOTE = {"EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "EURGBP", "XAUUSD", "XAGUSD"}
+        if symbol not in _USD_QUOTE:
+            # USD-base pairs (USDJPY, EURJPY …): 1 unit = 1 USD of base currency
+            # sl_distance is in JPY → convert: units = (risk_usd × rate) / sl_dist_jpy
+            units = (risk_amount * entry) / sl_distance
+            # Leverage cap: notional_usd = units × 1 (units already in USD)
+            # E.g. USDJPY@150, 60k units → $60k notional / $10k account = 6:1 leverage
+            max_units = self.account_balance * MAX_LEVERAGE
+        else:
+            # EUR/GBP-base pairs: 1 unit = 1 EUR/GBP, notional in USD = units × entry
+            units = risk_amount / sl_distance
+            max_units = (self.account_balance * MAX_LEVERAGE) / entry
         units = min(units, max_units)
 
         return round(units)  # OANDA accepts integer units
@@ -227,30 +244,34 @@ class ForexRiskEngine:
         if sl is None:
             return None
 
-        tps = self.calc_tp(side, entry, sl, liquidity_zones)
+        tps = self.calc_tp(side, entry, sl, liquidity_zones, symbol=symbol)
         if not tps:
             return None
 
-        position_size = self.calc_position_size(symbol, entry, sl)
+        _risk_pct = RISK_PER_TRADE_OVERRIDE.get(symbol, RISK_PER_TRADE)
+        position_size = self.calc_position_size(symbol, entry, sl, risk_pct=_risk_pct)
         if position_size <= 0:
             return None
 
         sl_dist = abs(entry - sl)
         rr = abs(tps[0]["level"] - entry) / sl_dist if sl_dist > 0 else 0
 
-        if rr < MIN_RR:
-            logger.debug(f"[{symbol}] RR={rr:.2f} < {MIN_RR} → reject")
+        _min_rr = MIN_RR_OVERRIDE.get(symbol, MIN_RR)
+        if rr < _min_rr:
+            logger.debug(f"[{symbol}] RR={rr:.2f} < {_min_rr} → reject")
             return None
 
         atr = _calc_atr(candles)
-        if sl_dist > atr * 4:
-            logger.debug(f"[{symbol}] SL too wide ({sl_dist:.6f} > {atr*4:.6f}) → reject")
+        if sl_dist > atr * 5:
+            # 5×ATR: nới từ 4→5 để capture thêm setups valid có swing hơi xa
+            # Trailing stop sẽ bảo vệ nếu giá không đủ momentum đến 2R
+            logger.debug(f"[{symbol}] SL too wide ({sl_dist:.6f} > {atr*5:.6f}) → reject")
             return None
 
         return {
             "sl":            round(sl, 6),
             "tp":            tps,
-            "risk":          RISK_PER_TRADE,
+            "risk":          _risk_pct,
             "position_size": position_size,
             "rr":            round(rr, 2),
             "management": {
@@ -310,16 +331,22 @@ class ForexRiskEngine:
         """
         Calculate PnL in USD for a closed Forex position.
 
-        For USD-quote pairs (EURUSD, GBPUSD, AUDUSD, NZDUSD):
-          pnl = (exit - entry) × units   [LONG]
-          pnl = (entry - exit) × units   [SHORT]
+        USD-quote pairs (EURUSD, GBPUSD, AUDUSD, NZDUSD, XAUUSD …):
+          pnl = price_change × units   (already in USD)
 
-        For USD-base pairs (USDJPY, USDCAD): same formula approximation.
-        Exact cross-pair PnL requires the live quote rate.
+        Non-USD-quote pairs (USDJPY, EURJPY, USDCAD, USDCHF …):
+          price_change is in quote currency (JPY, CAD, CHF)
+          Convert to USD: pnl = price_change × units / entry
+          E.g. USDJPY@150, +30 pips, 200k units:
+               pnl = 0.30 × 200,000 / 150 = $400
         """
         price_change = exit_price - entry
         if side == "SHORT":
             price_change = -price_change
+
+        _USD_QUOTE = {"EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "EURGBP", "XAUUSD", "XAGUSD"}
+        if symbol not in _USD_QUOTE and entry > 0:
+            return round(price_change * units / entry, 4)
         return round(price_change * units, 4)
 
     # ─────────────────────────────────────────
@@ -345,8 +372,8 @@ class ForexRiskEngine:
             logger.warning(f"Max drawdown {drawdown:.1%} hit — disabling trading")
             self.trading_enabled = False
 
-        if self._consecutive_losses >= 5:
-            logger.warning("5 consecutive losses — pausing trading")
+        if self._consecutive_losses >= self._consec_limit:
+            logger.warning(f"{self._consec_limit} consecutive losses — pausing trading [{self.symbol}]")
             self.trading_enabled = False
 
     def reset_daily(self):
