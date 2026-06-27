@@ -550,8 +550,12 @@ class LiveTradingEngine:
             order_id = str(ticket)
 
             if is_market:
-                # MARKET fill ngay, SL/TP đã nhúng vào order MT5 → finalize luôn.
+                # MARKET fill ngay — lấy actual fill price từ MT5 để track đúng entry
                 self._placing_orders.discard(symbol)
+                mt5_pos = await self.order_manager.get_position(symbol)
+                if mt5_pos and mt5_pos.get("entry"):
+                    signal = dict(signal)  # copy để không mutate original
+                    signal["entry_price"] = mt5_pos["entry"]
                 await self._finalize_entry(symbol, order_id, signal, risk, tp_level)
                 return
 
@@ -568,25 +572,25 @@ class LiveTradingEngine:
                 # SL/TP đã nhúng trong LIMIT order → không cần đặt lại
                 await self._finalize_entry(symbol, order_id, signal, risk, tp_level)
             else:
-            # Chưa fill — theo dõi trong _monitoring_loop
-            logger.info(f"[LIVE] LIMIT order #{order_id} ({symbol}) chưa fill → theo dõi")
-            self._pending_limit_orders[symbol] = {
-                "order_id":  order_id,
-                "ticket":    int(ticket),
-                "signal":    signal,
-                "risk":      risk,
-                "qty":       qty,
-                "tp_level":  tp_level,
-                "placed_at": datetime.now(tz=timezone.utc),
-            }
-            await telegram.send(
-                f"⏳ [LIVE] LIMIT pending {signal['side']} {symbol}\n"
-                f"  Entry : {signal['entry_price']:.5f}\n"
-                f"  SL    : {risk['sl']:.5f}\n"
-                f"  TP    : {tp_level:.5f}\n"
-                f"  Lots  : {qty:.2f}L  RR={risk['rr']:.1f}R\n"
-                f"  TTL   : {LIMIT_ORDER_TIMEOUT_CANDLES} nến {ENTRY_TIMEFRAME}"
-            )
+                # Chưa fill — theo dõi trong _monitoring_loop
+                logger.info(f"[LIVE] LIMIT order #{order_id} ({symbol}) chưa fill → theo dõi")
+                self._pending_limit_orders[symbol] = {
+                    "order_id":  order_id,
+                    "ticket":    int(ticket),
+                    "signal":    signal,
+                    "risk":      risk,
+                    "qty":       qty,
+                    "tp_level":  tp_level,
+                    "placed_at": datetime.now(tz=timezone.utc),
+                }
+                await telegram.send(
+                    f"⏳ [LIVE] LIMIT pending {signal['side']} {symbol}\n"
+                    f"  Entry : {signal['entry_price']:.5f}\n"
+                    f"  SL    : {risk['sl']:.5f}\n"
+                    f"  TP    : {tp_level:.5f}\n"
+                    f"  Lots  : {qty:.2f}L  RR={risk['rr']:.1f}R\n"
+                    f"  TTL   : {LIMIT_ORDER_TIMEOUT_CANDLES} nến {ENTRY_TIMEFRAME}"
+                )
         except Exception:
             logger.exception(f"[{symbol}] Exception in _execute_signal")
         finally:
@@ -640,8 +644,7 @@ class LiveTradingEngine:
                     self.risk_engine.account_balance = balance
 
                 # Bug fix: reset daily limits mỗi ngày UTC mới (match backtest)
-                from datetime import date
-                today = date.today()
+                today = datetime.now(tz=timezone.utc).date()
                 if _last_day is None or today != _last_day:
                     self.risk_engine.reset_daily()
                     _last_day = today

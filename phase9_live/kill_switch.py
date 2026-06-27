@@ -70,7 +70,7 @@ class KillSwitch:
 
         # Phase 9.7: close all and disable
         try:
-            await self.order_manager.close_all_positions(SYMBOLS)
+            await self.order_manager.close_all_positions()
             logger.info("All positions closed via kill switch")
         except Exception as e:
             logger.error(f"Kill switch close_all error: {e}")
