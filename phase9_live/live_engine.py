@@ -70,6 +70,10 @@ class LiveTradingEngine:
         # hiện tại, có thể cải thiện sau bằng cách lưu vào DB.
         self._pending_limit_orders: Dict[str, Dict] = {}
 
+        # Guard chống race condition: symbol đang trong quá trình đặt lệnh
+        # (giữa lúc place_order và khi _pending_limit_orders được cập nhật)
+        self._placing_orders: set = set()
+
         # TTL memory cho sweep/choch — persist N candles sau khi detect (như backtest)
         self._last_sweep: Dict[str, Optional[Dict]] = {}
         self._last_choch: Dict[str, Optional[Dict]] = {}
@@ -493,66 +497,77 @@ class LiveTradingEngine:
         symbol   = signal["symbol"]
         side_api = "BUY" if signal["side"] == "LONG" else "SELL"
 
-        # risk_engine trả về units (OANDA-compatible) → convert sang MT5 lots
-        # 1 lot = 100,000 units. Tối thiểu 0.01 lot.
-        qty_units = risk["position_size"]
-        qty       = max(0.01, round(qty_units / 100_000, 2))
+        # Guard: nếu đang đặt lệnh cho symbol này (race condition giữa place_order
+        # và asyncio.sleep(2) trước khi _pending_limit_orders được cập nhật) → skip
+        if symbol in self._placing_orders or symbol in self._pending_limit_orders:
+            logger.warning(f"[{symbol}] Duplicate signal ignored — already placing/pending")
+            return
+        self._placing_orders.add(symbol)
 
-        tp_level = risk["tp"][0]["level"] if risk.get("tp") else 0.0
+        try:
+            # risk_engine trả về units (OANDA-compatible) → convert sang MT5 lots
+            # 1 lot = 100,000 units. Tối thiểu 0.01 lot.
+            qty_units = risk["position_size"]
+            qty       = max(0.01, round(qty_units / 100_000, 2))
 
-        logger.info(
-            f"[LIVE] Executing {signal['side']} {symbol} "
-            f"{qty:.2f}L (={qty_units:.0f} units) @ {signal['entry_price']:.5f}"
-        )
+            tp_level = risk["tp"][0]["level"] if risk.get("tp") else 0.0
 
-        is_market = signal.get("entry_type") == "MARKET"
-
-        if is_market:
-            # MARKET: SL/TP nhúng thẳng vào order request MT5
-            ticket = await self.order_manager.place_order(
-                symbol    = symbol,
-                side      = side_api,
-                volume    = qty,
-                sl        = risk["sl"],
-                tp        = tp_level,
-                order_type= "MARKET",
-            )
-        else:
-            # LIMIT: SL/TP nhúng vào LIMIT order MT5 ngay từ đầu
-            # (MT5 hỗ trợ SL/TP embedded trong pending order)
-            ticket = await self.order_manager.place_order(
-                symbol     = symbol,
-                side       = side_api,
-                volume     = qty,
-                price      = signal["entry_price"],
-                sl         = risk["sl"],
-                tp         = tp_level,
-                order_type = "LIMIT",
+            logger.info(
+                f"[LIVE] Executing {signal['side']} {symbol} "
+                f"{qty:.2f}L (={qty_units:.0f} units) @ {signal['entry_price']:.5f}"
             )
 
-        if not ticket:
-            self._api_errors += 1
-            logger.error(f"Order failed for {symbol}")
-            return
+            is_market = signal.get("entry_type") == "MARKET"
 
-        order_id = str(ticket)
+            if is_market:
+                # MARKET: SL/TP nhúng thẳng vào order request MT5
+                ticket = await self.order_manager.place_order(
+                    symbol    = symbol,
+                    side      = side_api,
+                    volume    = qty,
+                    sl        = risk["sl"],
+                    tp        = tp_level,
+                    order_type= "MARKET",
+                )
+            else:
+                # LIMIT: SL/TP nhúng vào LIMIT order MT5 ngay từ đầu
+                # (MT5 hỗ trợ SL/TP embedded trong pending order)
+                ticket = await self.order_manager.place_order(
+                    symbol     = symbol,
+                    side       = side_api,
+                    volume     = qty,
+                    price      = signal["entry_price"],
+                    sl         = risk["sl"],
+                    tp         = tp_level,
+                    order_type = "LIMIT",
+                )
 
-        if is_market:
-            # MARKET fill ngay, SL/TP đã nhúng vào order MT5 → finalize luôn.
-            await self._finalize_entry(symbol, order_id, signal, risk, tp_level)
-            return
+            if not ticket:
+                self._api_errors += 1
+                logger.error(f"Order failed for {symbol}")
+                return
 
-        # LIMIT entry: check fill sau 2s bằng cách xem ticket còn trong pending không
-        await asyncio.sleep(2)
-        pending = await self.order_manager.get_pending_orders(symbol)
-        still_pending = any(str(o["ticket"]) == order_id for o in pending)
-        pos = await self.order_manager.get_position(symbol)
-        filled = (not still_pending) and (pos is not None)
+            order_id = str(ticket)
 
-        if filled:
-            # SL/TP đã nhúng trong LIMIT order → không cần đặt lại
-            await self._finalize_entry(symbol, order_id, signal, risk, tp_level)
-        else:
+            if is_market:
+                # MARKET fill ngay, SL/TP đã nhúng vào order MT5 → finalize luôn.
+                self._placing_orders.discard(symbol)
+                await self._finalize_entry(symbol, order_id, signal, risk, tp_level)
+                return
+
+            # LIMIT entry: check fill sau 2s bằng cách xem ticket còn trong pending không
+            await asyncio.sleep(2)
+            pending = await self.order_manager.get_pending_orders(symbol)
+            still_pending = any(str(o["ticket"]) == order_id for o in pending)
+            pos = await self.order_manager.get_position(symbol)
+            filled = (not still_pending) and (pos is not None)
+
+            self._placing_orders.discard(symbol)  # release guard sau sleep
+
+            if filled:
+                # SL/TP đã nhúng trong LIMIT order → không cần đặt lại
+                await self._finalize_entry(symbol, order_id, signal, risk, tp_level)
+            else:
             # Chưa fill — theo dõi trong _monitoring_loop
             logger.info(f"[LIVE] LIMIT order #{order_id} ({symbol}) chưa fill → theo dõi")
             self._pending_limit_orders[symbol] = {
@@ -572,6 +587,11 @@ class LiveTradingEngine:
                 f"  Lots  : {qty:.2f}L  RR={risk['rr']:.1f}R\n"
                 f"  TTL   : {LIMIT_ORDER_TIMEOUT_CANDLES} nến {ENTRY_TIMEFRAME}"
             )
+        except Exception:
+            logger.exception(f"[{symbol}] Exception in _execute_signal")
+        finally:
+            # Đảm bảo guard luôn được giải phóng, kể cả khi có exception
+            self._placing_orders.discard(symbol)
 
     async def _place_sl_tp_for_limit(self, symbol: str, signal: Dict, risk: Dict,
                                       qty: float, tp_level: float):
