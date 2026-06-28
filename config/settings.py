@@ -43,7 +43,7 @@ _PROFILES = {
         "max_leverage":       30,
     },
     "AGGRESSIVE": {
-        "symbols":            ["XAUUSD", "AUDUSD", "USDCHF"],
+        "symbols":            ["XAUUSD"],  # trial 5m — thêm lại AUDUSD/USDCHF sau khi test xong
         "risk_per_trade":     0.02,
         "max_daily_loss":     0.06,
         "max_drawdown":       0.35,
@@ -102,7 +102,7 @@ DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NA
 # SYMBOLS & TIMEFRAMES
 # ─────────────────────────────────────────────
 SYMBOLS             = _p["symbols"]
-TIMEFRAMES          = ["15m", "1h"]
+TIMEFRAMES          = ["5m", "1h"]   # 5m=entry, 1h=bias
 ENTRY_TIMEFRAME     = os.getenv("ENTRY_TIMEFRAME", "1h")   # 15m | 1h
 STRUCTURE_TIMEFRAME = ENTRY_TIMEFRAME
 BIAS_TIMEFRAME      = "1h"
