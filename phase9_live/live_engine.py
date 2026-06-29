@@ -652,10 +652,19 @@ class LiveTradingEngine:
                     logger.warning(f"[Monitor] balance=None (count={_balance_none_count})")
                     if _balance_none_count == 3:  # alert sau 3 phút liên tiếp
                         await telegram.send(
-                            "⚠️ MT5 API mất kết nối — balance=None 3 lần liên tiếp\n"
-                            "Bot vẫn chạy nhưng KHÔNG THỂ đặt lệnh.\n"
-                            "Cần restart bot!"
+                            "⚠️ MT5 API mất kết nối — đang thử reconnect..."
                         )
+                        logger.warning("[Monitor] Attempting MT5 reconnect ...")
+                        ok = await self.order_manager.reconnect()
+                        if ok:
+                            logger.info("[Monitor] MT5 reconnect SUCCESS")
+                            # balance sẽ được lấy lại ở vòng lặp tiếp theo
+                        else:
+                            logger.error("[Monitor] MT5 reconnect FAILED")
+                            await telegram.send(
+                                "🔴 MT5 reconnect thất bại!\n"
+                                "Bot KHÔNG THỂ đặt lệnh. Cần restart thủ công."
+                            )
 
                 # Bug fix: reset daily limits mỗi ngày UTC mới (match backtest)
                 today = datetime.now(tz=timezone.utc).date()

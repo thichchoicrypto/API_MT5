@@ -395,6 +395,34 @@ class MT5OrderManager:
 
         return await self._run(_get)
 
+    async def reconnect(self) -> bool:
+        """Shutdown và reinitialize MT5 Python API connection."""
+        from config.settings import MT5_LOGIN, MT5_PASSWORD, MT5_SERVER, MT5_PATH
+
+        def _reconnect_sync():
+            mt5 = _mt5()
+            mt5.shutdown()
+            import time; time.sleep(2)
+            kwargs = {}
+            if MT5_PATH:
+                kwargs["path"] = MT5_PATH
+            if not mt5.initialize(**kwargs):
+                logger.error(f"MT5 reconnect initialize failed: {mt5.last_error()}")
+                return False
+            if MT5_LOGIN:
+                ok = mt5.login(MT5_LOGIN, password=MT5_PASSWORD, server=MT5_SERVER)
+                if not ok:
+                    logger.error(f"MT5 reconnect login failed: {mt5.last_error()}")
+                    mt5.shutdown()
+                    return False
+            info = mt5.account_info()
+            if info:
+                logger.info(f"MT5 reconnected — balance={info.balance}")
+                return True
+            return False
+
+        return await self._run(_reconnect_sync)
+
     # ──────────────────────────────────────────────────────────
     # CLOSE ALL POSITIONS
     # ──────────────────────────────────────────────────────────
