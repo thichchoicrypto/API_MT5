@@ -636,12 +636,26 @@ class LiveTradingEngine:
     async def _monitoring_loop(self):
         """Phase 9.13: Periodic system monitoring + position close detection."""
         _last_day = None
+        _balance_none_count = 0  # đếm số lần liên tiếp balance=None
         while self._running:
             await asyncio.sleep(60)
             try:
                 balance = await self.order_manager.get_account_balance()
                 if balance:
                     self.risk_engine.account_balance = balance
+                    if _balance_none_count > 0:
+                        # Reconnected — notify recovery
+                        await telegram.send(f"✅ MT5 reconnected — balance=${balance:.2f}")
+                    _balance_none_count = 0
+                else:
+                    _balance_none_count += 1
+                    logger.warning(f"[Monitor] balance=None (count={_balance_none_count})")
+                    if _balance_none_count == 3:  # alert sau 3 phút liên tiếp
+                        await telegram.send(
+                            "⚠️ MT5 API mất kết nối — balance=None 3 lần liên tiếp\n"
+                            "Bot vẫn chạy nhưng KHÔNG THỂ đặt lệnh.\n"
+                            "Cần restart bot!"
+                        )
 
                 # Bug fix: reset daily limits mỗi ngày UTC mới (match backtest)
                 today = datetime.now(tz=timezone.utc).date()
