@@ -506,9 +506,12 @@ class LiveTradingEngine:
 
         try:
             # risk_engine trả về units (OANDA-compatible) → convert sang MT5 lots
-            # 1 lot = 100,000 units. Tối thiểu 0.01 lot.
+            # FX pairs:  1 lot = 100,000 units (EURUSD, GBPUSD, AUDUSD, USDCHF…)
+            # XAUUSD:    1 lot = 100 oz  → chia 100
+            # XAGUSD:    1 lot = 5000 oz → chia 5000
+            _MT5_CONTRACT = {"XAUUSD": 100, "XAGUSD": 5_000}
             qty_units = risk["position_size"]
-            qty       = max(0.01, round(qty_units / 100_000, 2))
+            qty       = max(0.01, round(qty_units / _MT5_CONTRACT.get(symbol, 100_000), 2))
 
             tp_level = risk["tp"][0]["level"] if risk.get("tp") else 0.0
 
