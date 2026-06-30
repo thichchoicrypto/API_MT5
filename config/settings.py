@@ -178,7 +178,7 @@ OB_LOOKBACK_OVERRIDE: dict = {
 # EURUSD: 2%→1.5% để giảm DD nhẹ
 # ─────────────────────────────────────────────
 RISK_PER_TRADE_OVERRIDE: dict = {
-    "XAUUSD": 0.01,   # 1% — halve MC DD from 80% → ~40%
+    "XAUUSD": 0.02,   # 2% — tăng từ 1% → 2%
     "GBPUSD": 0.01,   # 1% — reduce DD, improve consistency
     "EURUSD": 0.015,  # 1.5% — slight reduction
     "USDCHF": 0.01,   # 1% — MC p95 DD 51.9% at 2%, reduce risk
