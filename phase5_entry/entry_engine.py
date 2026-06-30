@@ -6,8 +6,8 @@ from typing import Optional, Dict, List
 import numpy as np
 from utils.logger import logger
 from config.settings import (
-    VOLUME_THRESHOLD, ENTRY_CONFIRM_CANDLES, MIN_RR, SESSION_FILTER_ENABLED,
-    CONFIRM_REQUIRED,
+    VOLUME_THRESHOLD, ENTRY_CONFIRM_CANDLES, MIN_RR, MIN_RR_OVERRIDE,
+    SESSION_FILTER_ENABLED, CONFIRM_REQUIRED,
 )
 from phase5_entry.trigger_detector import classify_trigger
 from utils.session_filter import is_trading_session, session_stop_reason
@@ -250,8 +250,9 @@ class EntryEngine:
                     return None
 
         # ── Layer 6: Risk pre-check ───────────────────────────────────
-        if risk_output and risk_output.get("rr", 0) < MIN_RR:
-            logger.debug(f"[{self.symbol}] Rejected RR={risk_output.get('rr'):.2f}")
+        _min_rr = MIN_RR_OVERRIDE.get(self.symbol, MIN_RR)  # per-symbol override
+        if risk_output and risk_output.get("rr", 0) < _min_rr:
+            logger.debug(f"[{self.symbol}] Rejected RR={risk_output.get('rr'):.2f} < {_min_rr}")
             self._reset_pending(side)
             self.last_eval_debug["stop_reason"] = f"l6_rr_fail_{risk_output.get('rr', 0):.1f}"
             return None
