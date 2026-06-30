@@ -681,6 +681,8 @@ class LiveTradingEngine:
 
                 # CHG-FX-031: breakeven — dời SL về entry khi đạt 1R profit
                 await self._check_breakeven_live()
+                # Trailing stop: sau BE, khi peak ≥ 1.3R → trail SL
+                await self._check_trailing_stop_live()
 
                 # Check if any tracked positions have been closed by OANDA (TP/SL hit)
                 await self._check_closed_positions(balance)
@@ -760,6 +762,80 @@ class LiveTradingEngine:
 
             except Exception as e:
                 logger.error(f"_check_breakeven_live error for {symbol}: {e}")
+
+    async def _check_trailing_stop_live(self):
+        """
+        Trailing stop: sau khi BE set (1R), khi peak đạt 1.3R → trail SL = peak - 0.4R
+        Match với backtest_engine logic để live/backtest nhất quán.
+        """
+        if not self.position_monitor.open_positions:
+            return
+
+        for symbol, pos in list(self.position_monitor.open_positions.items()):
+            try:
+                if not pos.be_set:
+                    continue  # chỉ trail sau khi BE đã set
+
+                current_price = await self.order_manager.get_current_price(symbol)
+                if not current_price:
+                    continue
+
+                entry   = pos.entry
+                sl_dist = abs(entry - pos.sl) if not pos.trail_set else abs(entry - (entry - pos.sl if pos.side == "SHORT" else pos.sl - entry))
+                # Recalculate sl_dist từ original entry-to-sl
+                orig_sl_dist = abs(entry - (pos.tp[0]["level"] - entry) / pos.tp[0]["rr"] * -1) if pos.tp else 0
+                # Simpler: lưu sl_dist ban đầu qua tp rr
+                # sl_dist = (tp1 - entry) / 2.5 cho XAUUSD
+                if pos.tp:
+                    tp1_level = pos.tp[0]["level"]
+                    tp1_rr    = pos.tp[0].get("rr", 2.5)
+                    sl_dist   = abs(tp1_level - entry) / tp1_rr if tp1_rr > 0 else 0
+                else:
+                    continue
+
+                if sl_dist <= 0:
+                    continue
+
+                # Cập nhật peak price
+                if pos.side == "LONG":
+                    if current_price > pos.peak_price:
+                        pos.peak_price = current_price
+                    # Trailing: khi peak ≥ entry + 1.3R
+                    if pos.peak_price >= entry + sl_dist * 1.3:
+                        trail_sl = pos.peak_price - sl_dist * 0.4
+                        if trail_sl > pos.sl:
+                            ok = await self.order_manager.modify_trade_sl(int(pos.order_id), symbol, new_sl=trail_sl)
+                            if ok:
+                                old_sl = pos.sl
+                                pos.sl = trail_sl
+                                pos.trail_set = True
+                                logger.info(f"[TRAIL] {symbol} LONG SL: {old_sl:.5f} → {trail_sl:.5f} (peak={pos.peak_price:.5f})")
+                                await telegram.send(
+                                    f"📈 [LIVE] Trailing Stop\n"
+                                    f"{symbol} LONG — SL → {trail_sl:.5f}\n"
+                                    f"Peak={pos.peak_price:.5f} (+{(pos.peak_price-entry)/sl_dist:.1f}R)"
+                                )
+                elif pos.side == "SHORT":
+                    if current_price < pos.peak_price:
+                        pos.peak_price = current_price
+                    # Trailing: khi peak ≤ entry - 1.3R
+                    if pos.peak_price <= entry - sl_dist * 1.3:
+                        trail_sl = pos.peak_price + sl_dist * 0.4
+                        if trail_sl < pos.sl:
+                            ok = await self.order_manager.modify_trade_sl(int(pos.order_id), symbol, new_sl=trail_sl)
+                            if ok:
+                                old_sl = pos.sl
+                                pos.sl = trail_sl
+                                pos.trail_set = True
+                                logger.info(f"[TRAIL] {symbol} SHORT SL: {old_sl:.5f} → {trail_sl:.5f} (peak={pos.peak_price:.5f})")
+                                await telegram.send(
+                                    f"📉 [LIVE] Trailing Stop\n"
+                                    f"{symbol} SHORT — SL → {trail_sl:.5f}\n"
+                                    f"Peak={pos.peak_price:.5f} (-{(entry-pos.peak_price)/sl_dist:.1f}R)"
+                                )
+
+            except Exception as e:
+                logger.error(f"_check_trailing_stop_live error for {symbol}: {e}")
 
     async def _check_pending_limit_orders(self):
         """

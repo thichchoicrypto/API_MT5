@@ -20,6 +20,8 @@ class LivePosition:
         self.tp = risk["tp"]
         self.tp_index = 0
         self.be_set = False
+        self.peak_price: float = self.entry   # track giá đỉnh/đáy sau entry
+        self.trail_set = False                # trailing stop đã active chưa
         self.opened_at = datetime.now(tz=timezone.utc)
         self.unrealized_pnl: float = 0.0
         self.funding_fees: float = 0.0
@@ -52,6 +54,8 @@ class LivePosition:
             pos.tp          = [{"level": tp1, "rr": 2.0, "size_ratio": 1.0}] if tp1 > 0 else []
             pos.tp_index    = 0
             pos.be_set      = False  # conservative default
+            pos.peak_price  = entry
+            pos.trail_set   = False
             pos.opened_at   = row.get("opened_at") or datetime.now(tz=timezone.utc)
             pos.unrealized_pnl  = 0.0
             pos.funding_fees    = 0.0
