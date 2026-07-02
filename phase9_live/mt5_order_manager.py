@@ -338,7 +338,8 @@ class MT5OrderManager:
     # GET LAST CLOSED TRADE
     # ──────────────────────────────────────────────────────────
     async def get_last_closed_trade(
-        self, symbol: str, since: Optional[datetime] = None
+        self, symbol: str, since: Optional[datetime] = None,
+        position_id: Optional[int] = None,
     ) -> Optional[Dict]:
         mt5     = _mt5()
         mt5_sym = MT5_SYMBOL_MAP.get(symbol, symbol)
@@ -350,19 +351,28 @@ class MT5OrderManager:
             if not deals:
                 return None
             bot_deals = sorted(
-                [d for d in deals if d.magic == BOT_MAGIC and d.entry == mt5.DEAL_ENTRY_OUT],
+                [d for d in deals
+                 if d.magic == BOT_MAGIC
+                 and d.entry == mt5.DEAL_ENTRY_OUT
+                 # Filter by position_id khi biết ticket — tránh lấy deal của trade khác
+                 and (position_id is None or d.position_id == position_id)],
                 key=lambda d: d.time, reverse=True
             )
             if not bot_deals:
                 return None
             d = bot_deals[0]
+            # profit của 1 deal có thể chưa tính commission — sum tất cả deals cùng position
+            position_profit = sum(
+                x.profit for x in deals
+                if x.position_id == d.position_id
+            )
             return {
                 "ticket":    d.position_id,
                 "symbol":    symbol,
                 "side":      "BUY" if d.type == mt5.DEAL_TYPE_BUY else "SELL",
                 "volume":    d.volume,
                 "close":     d.price,
-                "profit":    d.profit,
+                "profit":    position_profit,  # tổng profit cả position (kể cả commission)
                 "close_time": datetime.fromtimestamp(d.time, tz=timezone.utc),
             }
 

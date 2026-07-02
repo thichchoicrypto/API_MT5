@@ -241,6 +241,35 @@ class LiveTradingEngine:
                     if pos:
                         self.position_monitor.restore(pos)
                 logger.info(f"Restored {len(self.position_monitor.open_positions)} position(s)")
+
+                # Startup orphan check: position đã restore từ DB nhưng MT5 đã đóng khi bot offline
+                # → gửi Telegram missed notification + update DB ngay tại startup
+                for symbol, pos in list(self.position_monitor.open_positions.items()):
+                    try:
+                        mt5_check = await self.order_manager.get_position(symbol)
+                        if mt5_check is None:
+                            logger.warning(
+                                f"[Startup] {symbol} not in MT5 — closed while bot was offline"
+                            )
+                            exit_price, pnl, status = await self._get_close_details(symbol, pos)
+                            await telegram.send(
+                                f"⚠️ [MISSED TP/SL] {status} {pos.side} {symbol}\n"
+                                f"  Exit  : {exit_price:.5f}\n"
+                                f"  P&L   : ${pnl:+.2f}\n"
+                                f"  Entry : {pos.entry:.5f}\n"
+                                f"  (Đóng khi bot offline — thông báo muộn)"
+                            )
+                            if hasattr(self, "_db") and db:
+                                await db.save_live_trade_close(
+                                    order_id=pos.order_id,
+                                    exit_price=exit_price,
+                                    pnl=pnl,
+                                    status=status,
+                                    balance=self.risk_engine.account_balance,
+                                )
+                            self.position_monitor.remove(symbol)
+                    except Exception as e:
+                        logger.error(f"[Startup] orphan check error for {symbol}: {e}")
         else:
                 logger.info("No open positions to restore")
 
@@ -981,7 +1010,11 @@ class LiveTradingEngine:
     async def _get_close_details(self, symbol: str, pos) -> tuple:
         """Fetch exit price + PnL from MT5 deal history."""
         try:
-            closed = await self.order_manager.get_last_closed_trade(symbol)
+            # Filter by position_id → tránh lấy deal của trade khác cùng symbol
+            position_id = int(pos.order_id) if pos.order_id else None
+            closed = await self.order_manager.get_last_closed_trade(
+                symbol, position_id=position_id
+            )
             if closed:
                 exit_price = float(closed.get("close", 0) or 0)
                 realized   = float(closed.get("profit", 0) or 0)
