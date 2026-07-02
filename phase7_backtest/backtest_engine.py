@@ -68,6 +68,7 @@ class BacktestTrade:
         self.be_set: bool = False
         self.tp_index: int = 0
         self.peak_price: float = entry_price   # track best price after entry (for trailing)
+        self.orig_sl_dist: float = abs(entry_price - risk["sl"])  # gốc, không đổi dù SL dời
 
     def to_dict(self) -> Dict:
         return {
@@ -546,92 +547,65 @@ class BacktestEngine:
         tps = trade.tps
 
         entry = trade.entry_price
-        sl_dist = abs(entry - sl)
+        sl_dist = trade.orig_sl_dist  # dùng sl_dist gốc — tránh = 0 sau khi BE set
+
+        tp_hit = tps and (
+            (side == "LONG"  and candle["high"] >= tps[trade.tp_index]["level"]) or
+            (side == "SHORT" and candle["low"]  <= tps[trade.tp_index]["level"])
+        )
+        sl_hit = (
+            (side == "LONG"  and candle["low"]  <= sl) or
+            (side == "SHORT" and candle["high"] >= sl)
+        )
+
+        # Khi cả TP và SL đều trong range 1 nến → dùng hướng nến để quyết định
+        # Nến bullish (close > open): giá lên trước → LONG TP / SHORT SL wins
+        # Nến bearish (close < open): giá xuống trước → LONG SL / SHORT TP wins
+        # Realistic hơn so với luôn check TP trước (inflate WR)
+        candle_bullish = candle["close"] >= candle["open"]
+        if tp_hit and sl_hit:
+            if side == "LONG":
+                tp_first = candle_bullish
+            else:
+                tp_first = not candle_bullish
+        else:
+            tp_first = tp_hit
 
         if side == "LONG":
-            # Track peak price (for trailing stop after BE)
             if candle["high"] > trade.peak_price:
                 trade.peak_price = candle["high"]
-
-            # Breakeven: move SL to entry at 1R
-            # 0.7R was too aggressive — XAUUSD pullbacks often touch entry after 0.7R
-            # causing TP trades to exit at BE instead of reaching 2R.
-            if not trade.be_set and candle["high"] >= entry + sl_dist:
-                trade.sl = entry
-                trade.be_set = True
-                sl = trade.sl
-
-            # Trailing stop: after BE (1R), when peak reaches 1.3R → trail SL to peak - 0.4R
-            # 1.3R activation: sweet spot — captures reversal without early-exiting TP runs
-            if trade.be_set and trade.peak_price >= entry + sl_dist * 1.3:
-                trail_level = trade.peak_price - sl_dist * 0.4
-                if trail_level > trade.sl:
-                    trade.sl = trail_level
-                    sl = trade.sl
-
-            # TP hit first — check before SL to prioritise full target
-            if tps and candle["high"] >= tps[trade.tp_index]["level"]:
-                trade.exit_price = tps[trade.tp_index]["level"]
-                trade.exit_time  = candle["open_time"]
-                trade.status = "TP"
-                trade.pnl = self._calc_pnl(trade)
-                self._trades.append(trade)
-                return trade.pnl
-
-            # SL hit (original SL, BE at entry, or trailing stop above entry)
-            if candle["low"] <= sl:
-                trade.exit_price = sl
-                trade.exit_time  = candle["open_time"]
-                if sl > entry:
-                    trade.status = "TP"   # trailing stop above entry = profit
-                elif trade.be_set and sl == entry:
-                    trade.status = "BE"
-                else:
-                    trade.status = "SL"
-                trade.pnl = self._calc_pnl(trade)
-                self._trades.append(trade)
-                return trade.pnl
-
         elif side == "SHORT":
-            # Track peak price (SHORT: favorable direction is DOWN, track lowest)
             if candle["low"] < trade.peak_price:
                 trade.peak_price = candle["low"]
 
-            # Breakeven at 1R
-            if not trade.be_set and candle["low"] <= entry - sl_dist:
-                trade.sl = entry
-                trade.be_set = True
-                sl = trade.sl
+        if tp_first and tp_hit:
+            trade.exit_price = tps[trade.tp_index]["level"]
+            trade.exit_time  = candle["open_time"]
+            trade.status = "TP"
+            trade.pnl = self._calc_pnl(trade)
+            self._trades.append(trade)
+            return trade.pnl
 
-            # Trailing stop: after BE (1R), when peak reaches 1.3R → trail SL to peak + 0.4R
-            if trade.be_set and trade.peak_price <= entry - sl_dist * 1.3:
-                trail_level = trade.peak_price + sl_dist * 0.4
-                if trail_level < trade.sl:
-                    trade.sl = trail_level
-                    sl = trade.sl
+        if sl_hit:
+            trade.exit_price = sl
+            trade.exit_time  = candle["open_time"]
+            if (side == "LONG" and sl > entry) or (side == "SHORT" and sl < entry):
+                trade.status = "TP"   # trailing stop in profit
+            elif trade.be_set and sl == entry:
+                trade.status = "BE"
+            else:
+                trade.status = "SL"
+            trade.pnl = self._calc_pnl(trade)
+            self._trades.append(trade)
+            return trade.pnl
 
-            # TP hit first (full 2R)
-            if tps and candle["low"] <= tps[trade.tp_index]["level"]:
-                trade.exit_price = tps[trade.tp_index]["level"]
-                trade.exit_time  = candle["open_time"]
-                trade.status = "TP"
-                trade.pnl = self._calc_pnl(trade)
-                self._trades.append(trade)
-                return trade.pnl
-
-            # SL hit (original, BE, or trailing stop below entry)
-            if candle["high"] >= sl:
-                trade.exit_price = sl
-                trade.exit_time  = candle["open_time"]
-                if sl < entry:
-                    trade.status = "TP"   # trailing stop below entry = profit
-                elif trade.be_set and sl == entry:
-                    trade.status = "BE"
-                else:
-                    trade.status = "SL"
-                trade.pnl = self._calc_pnl(trade)
-                self._trades.append(trade)
-                return trade.pnl
+        if tp_hit:
+            trade.exit_price = tps[trade.tp_index]["level"]
+            trade.exit_time  = candle["open_time"]
+            trade.status = "TP"
+            trade.pnl = self._calc_pnl(trade)
+            self._trades.append(trade)
+            return trade.pnl
 
         return None
 

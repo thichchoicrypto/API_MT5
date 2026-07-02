@@ -178,7 +178,7 @@ OB_LOOKBACK_OVERRIDE: dict = {
 # EURUSD: 2%→1.5% để giảm DD nhẹ
 # ─────────────────────────────────────────────
 RISK_PER_TRADE_OVERRIDE: dict = {
-    "XAUUSD": 0.02,   # 2% — tăng từ 1% → 2%
+    "XAUUSD": 0.01,   # 1% — giảm DD từ 37% → ~19%
     "GBPUSD": 0.01,   # 1% — reduce DD, improve consistency
     "EURUSD": 0.015,  # 1.5% — slight reduction
     "USDCHF": 0.01,   # 1% — MC p95 DD 51.9% at 2%, reduce risk
@@ -191,7 +191,7 @@ RISK_PER_TRADE_OVERRIDE: dict = {
 # Default (FX pairs): (2.0, 2.5, 4.0)
 # ─────────────────────────────────────────────
 TP_MULTIPLIERS_OVERRIDE: dict = {
-    "XAUUSD": (1.0, 2.0, 3.5),   # test 1.0R TP1
+    "XAUUSD": (2.5, 3.5, 5.0),   # test 2.5R TP1
     "USDJPY": (2.5, 3.5, 5.0),   # JPY pairs volatile, TP xa hơn
     # EURUSD/GBPUSD: default (2.0, 2.5, 4.0) — 2.5R không giúp nhiều, giữ nguyên
 }
@@ -202,7 +202,7 @@ TP_MULTIPLIERS_OVERRIDE: dict = {
 # XAUUSD/USDJPY: 2.0 — chỉ lấy setup có ít nhất 2R potential
 # ─────────────────────────────────────────────
 MIN_RR_OVERRIDE: dict = {
-    "XAUUSD": 0.8,  # test 1.0R TP — chấp nhận setup RR >= 0.8
+    "XAUUSD": 2.0,  # 2.5R TP — chỉ lấy setup có RR >= 2.0
     "USDJPY": 2.0,
 }
 
