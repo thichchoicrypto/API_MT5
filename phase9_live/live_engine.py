@@ -673,6 +673,7 @@ class LiveTradingEngine:
                 today = datetime.now(tz=timezone.utc).date()
                 if _last_day is None or today != _last_day:
                     self.risk_engine.reset_daily()
+                    self.kill_switch.reset()   # auto-reset kill switch mỗi ngày mới
                     _last_day = today
                     logger.info(f"[Monitor] Daily limits reset for {today}")
 
@@ -681,8 +682,7 @@ class LiveTradingEngine:
 
                 # CHG-FX-031: breakeven — dời SL về entry khi đạt 1R profit
                 await self._check_breakeven_live()
-                # Trailing stop: sau BE, khi peak ≥ 1.3R → trail SL
-                await self._check_trailing_stop_live()
+                # Trailing stop: disabled — chỉ dùng BE
 
                 # Check if any tracked positions have been closed by OANDA (TP/SL hit)
                 await self._check_closed_positions(balance)
