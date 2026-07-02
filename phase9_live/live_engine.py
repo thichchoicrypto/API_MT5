@@ -273,6 +273,42 @@ class LiveTradingEngine:
         else:
                 logger.info("No open positions to restore")
 
+        # Startup: check MT5 active positions mà bot KHÔNG track (LIMIT fill khi bot offline)
+        # Những position này không có trong DB (vì _finalize_entry chưa chạy)
+        try:
+            mt5_all = await self.order_manager.get_all_positions()
+            for p in mt5_all:
+                sym = p.get("symbol", "")
+                if sym and sym not in self.position_monitor.open_positions:
+                    logger.warning(
+                        f"[Startup] Untracked MT5 position found: {sym} "
+                        f"{p.get('side')} ticket=#{p.get('ticket')}"
+                    )
+                    await telegram.send(
+                        f"⚠️ [LIVE] Untracked position found on startup\n"
+                        f"  {sym} {p.get('side')} entry={p.get('entry', 0):.5f}\n"
+                        f"  SL={p.get('sl', 0):.5f} TP={p.get('tp', 0):.5f}\n"
+                        f"  ticket=#{p.get('ticket')} (LIMIT fill khi bot offline?)\n"
+                        f"  Bot sẽ theo dõi từ đây."
+                    )
+                    # Tạo signal/risk giả để track — entry/sl/tp lấy từ MT5 data
+                    _fake_signal = {
+                        "symbol": sym,
+                        "side": "LONG" if p.get("side") == "BUY" else "SHORT",
+                        "entry_price": p.get("entry", 0),
+                        "entry_type": "LIMIT",
+                    }
+                    _fake_risk = {
+                        "sl": p.get("sl", 0),
+                        "tp": [{"level": p.get("tp", 0), "rr": 0}],
+                        "rr": 0,
+                        "position_size": 0,
+                    }
+                    order_id = str(p.get("ticket", 0))
+                    self.position_monitor.track({"orderId": order_id}, _fake_signal, _fake_risk)
+        except Exception as e:
+            logger.error(f"[Startup] untracked position check error: {e}")
+
         # Setup polling collector (MT5 on Windows / yfinance on Mac)
         from config.settings import DATA_SOURCE as _DS
         if _DS == "MT5":
@@ -934,7 +970,52 @@ class LiveTradingEngine:
                         await self._finalize_entry(symbol, pend["order_id"], signal, risk, pend["tp_level"])
                         logger.info(f"[LIVE] LIMIT #{ticket} ({symbol}) filled → finalized")
                     else:
-                        logger.info(f"[LIVE] LIMIT #{ticket} ({symbol}) bị cancel → bỏ theo dõi")
+                        # Không còn pending VÀ không có position → fill+close trong cùng 60s window
+                        # Phải check deal history — KHÔNG được coi là cancel ngay
+                        closed = await self.order_manager.get_last_closed_trade(
+                            symbol, position_id=ticket
+                        )
+                        if closed and closed.get("profit") is not None:
+                            # LIMIT đã fill rồi đóng (TP/SL) trước khi ta kịp detect fill
+                            signal  = pend["signal"]
+                            risk    = pend["risk"]
+                            pnl     = float(closed["profit"])
+                            exit_p  = float(closed["close"])
+                            status  = "TP" if pnl > 0 else ("SL" if pnl < 0 else "BE")
+                            icon    = "✅" if pnl > 0 else "🔴"
+                            logger.info(
+                                f"[LIVE] LIMIT #{ticket} ({symbol}) filled+{status} "
+                                f"(detected late) P&L=${pnl:+.2f}"
+                            )
+                            await telegram.send(
+                                f"{icon} [LIVE] LIMIT fill+{status} {signal['side']} {symbol}\n"
+                                f"  Entry : {signal.get('entry_price', 0):.5f}\n"
+                                f"  Exit  : {exit_p:.5f}\n"
+                                f"  P&L   : ${pnl:+.2f}\n"
+                                f"  Lots  : {pend.get('qty', 0):.2f}L\n"
+                                f"  (Khớp và đóng trong cùng polling window)"
+                            )
+                            if hasattr(self, "_db") and self._db:
+                                await self._db.save_live_trade_open(
+                                    order_id=str(ticket),
+                                    symbol=symbol,
+                                    side=signal["side"],
+                                    entry_price=signal.get("entry_price", 0),
+                                    sl=risk.get("sl", 0),
+                                    tp=pend.get("tp_level", 0),
+                                    size=risk.get("position_size", 0),
+                                    balance=self.risk_engine.account_balance,
+                                )
+                                await self._db.save_live_trade_close(
+                                    order_id=str(ticket),
+                                    exit_price=exit_p,
+                                    pnl=pnl,
+                                    status=status,
+                                    balance=self.risk_engine.account_balance,
+                                )
+                            self.risk_engine.register_pnl(pnl)
+                        else:
+                            logger.info(f"[LIVE] LIMIT #{ticket} ({symbol}) bị cancel → bỏ theo dõi")
                     del self._pending_limit_orders[symbol]
                 # còn trong pending → chưa fill, chờ tiếp
 
