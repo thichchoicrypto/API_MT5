@@ -264,10 +264,8 @@ class ForexRiskEngine:
         atr = _calc_atr(candles)
         if sl_dist > atr * 5:
             # 5×ATR: nới từ 4→5 để capture thêm setups valid có swing hơi xa
-            # Trailing stop sẽ bảo vệ nếu giá không đủ momentum đến 2R
             logger.debug(f"[{symbol}] SL too wide ({sl_dist:.6f} > {atr*5:.6f}) → reject")
             return None
-
         return {
             "sl":            round(sl, 6),
             "tp":            tps,

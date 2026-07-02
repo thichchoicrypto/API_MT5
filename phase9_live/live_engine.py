@@ -512,6 +512,9 @@ class LiveTradingEngine:
             _MT5_CONTRACT = {"XAUUSD": 100, "XAGUSD": 5_000}
             qty_units = risk["position_size"]
             qty       = max(0.01, round(qty_units / _MT5_CONTRACT.get(symbol, 100_000), 2))
+            # Cap max lot per symbol — tránh SL hẹp tạo lot quá lớn
+            _MAX_LOT  = {"XAUUSD": 0.5, "XAGUSD": 0.5}
+            qty       = min(qty, _MAX_LOT.get(symbol, 99.0))
 
             tp_level = risk["tp"][0]["level"] if risk.get("tp") else 0.0
 
