@@ -246,11 +246,13 @@ class LiveTradingEngine:
                 # → gửi Telegram missed notification + update DB ngay tại startup
                 for oid, pos in list(self.position_monitor.open_positions.items()):
                     symbol = pos.symbol
+                    _should_remove = False
                     try:
                         ticket = int(pos.order_id) if pos.order_id else 0
                         mt5_check = (await self.order_manager.get_position_by_ticket(ticket)
                                      if ticket else await self.order_manager.get_position(symbol))
                         if mt5_check is None:
+                            _should_remove = True
                             logger.warning(
                                 f"[Startup] {symbol} #{oid} not in MT5 — closed while bot was offline"
                             )
@@ -263,16 +265,23 @@ class LiveTradingEngine:
                                 f"  (Đóng khi bot offline — thông báo muộn)"
                             )
                             if hasattr(self, "_db") and db:
-                                await db.save_live_trade_close(
-                                    order_id=pos.order_id,
-                                    exit_price=exit_price,
-                                    pnl=pnl,
-                                    status=status,
-                                    balance=self.risk_engine.account_balance,
-                                )
-                            self.position_monitor.remove(oid)
+                                try:
+                                    await db.save_live_trade_close(
+                                        order_id=pos.order_id,
+                                        exit_price=exit_price,
+                                        pnl=pnl,
+                                        status=status,
+                                        balance=self.risk_engine.account_balance,
+                                    )
+                                except Exception as db_err:
+                                    logger.warning(f"[Startup] DB save skipped (already closed?): {db_err}")
                     except Exception as e:
                         logger.error(f"[Startup] orphan check error for {symbol}: {e}")
+                    finally:
+                        # ALWAYS remove từ monitor dù DB save có fail hay không
+                        # Tránh loop detect cùng position nhiều lần → spam notifications
+                        if _should_remove:
+                            self.position_monitor.remove(oid)
         else:
                 logger.info("No open positions to restore")
 
@@ -1048,6 +1057,7 @@ class LiveTradingEngine:
 
         for order_id, pos in list(self.position_monitor.open_positions.items()):
             symbol = pos.symbol
+            _should_remove = False
             try:
                 # Check theo ticket cụ thể — tránh nhầm với lệnh khác cùng symbol
                 ticket   = int(pos.order_id) if pos.order_id else 0
@@ -1056,6 +1066,7 @@ class LiveTradingEngine:
                 pos_open = mt5_pos is not None
 
                 if not pos_open:
+                    _should_remove = True
                     # Position closed on MT5 (TP/SL hit) — fetch close details
                     exit_price, pnl, status = await self._get_close_details(symbol, pos)
 
@@ -1071,32 +1082,41 @@ class LiveTradingEngine:
 
                     # Update DB
                     if hasattr(self, "_db") and self._db:
-                        await self._db.save_live_trade_close(
-                            order_id=pos.order_id,
-                            exit_price=exit_price,
-                            pnl=pnl,
-                            status=status,
-                            balance=current_balance or self.risk_engine.account_balance,
-                        )
-                        if pos.candle_time:
-                            await self._db.update_candle_tracker_outcome(
-                                symbol=symbol,
-                                timeframe=ENTRY_TIMEFRAME,
-                                candle_time=pos.candle_time,
-                                side=pos.side,
+                        try:
+                            await self._db.save_live_trade_close(
+                                order_id=pos.order_id,
                                 exit_price=exit_price,
                                 pnl=pnl,
-                                exit_reason=status,
+                                status=status,
+                                balance=current_balance or self.risk_engine.account_balance,
                             )
+                        except Exception as db_err:
+                            logger.warning(f"_check_closed_positions DB save skipped (already closed?): {db_err}")
+                        if pos.candle_time:
+                            try:
+                                await self._db.update_candle_tracker_outcome(
+                                    symbol=symbol,
+                                    timeframe=ENTRY_TIMEFRAME,
+                                    candle_time=pos.candle_time,
+                                    side=pos.side,
+                                    exit_price=exit_price,
+                                    pnl=pnl,
+                                    exit_reason=status,
+                                )
+                            except Exception:
+                                pass
 
                     # Update risk engine
                     if pnl:
                         self.risk_engine.register_pnl(pnl)
 
-                    self.position_monitor.remove(order_id)
-
             except Exception as e:
                 logger.error(f"_check_closed_positions error for {symbol}: {e}")
+            finally:
+                # ALWAYS remove dù DB save có fail hay không
+                # Tránh re-detect cùng position → spam notifications vô tận
+                if _should_remove:
+                    self.position_monitor.remove(order_id)
 
     async def _get_close_details(self, symbol: str, pos) -> tuple:
         """Fetch exit price + PnL from MT5 deal history."""

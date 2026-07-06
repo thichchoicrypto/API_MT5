@@ -380,14 +380,45 @@ class MT5OrderManager:
             deals = mt5.history_deals_get(start, now, group=mt5_sym)
             if not deals:
                 return None
-            bot_deals = sorted(
+
+            # Lấy tất cả CLOSE deals của bot
+            all_close_deals = sorted(
                 [d for d in deals
                  if d.magic == BOT_MAGIC
-                 and d.entry == mt5.DEAL_ENTRY_OUT
-                 # Filter by position_id khi biết ticket — tránh lấy deal của trade khác
-                 and (position_id is None or d.position_id == position_id)],
+                 and d.entry == mt5.DEAL_ENTRY_OUT],
                 key=lambda d: d.time, reverse=True
             )
+            if not all_close_deals:
+                return None
+
+            # Filter by position_id nếu có — tránh nhầm lệnh khi nhiều position cùng symbol
+            if position_id is not None:
+                bot_deals = [d for d in all_close_deals if d.position_id == position_id]
+                if not bot_deals:
+                    # Fallback: một số broker dùng DEAL ticket làm position_id
+                    # (không phải ORDER ticket mà ta lưu)
+                    # Tìm opening deal có deal.order == order_ticket → lấy deal.position_id thật
+                    open_deals = [d for d in deals
+                                  if d.magic == BOT_MAGIC
+                                  and d.entry in (mt5.DEAL_ENTRY_IN, mt5.DEAL_ENTRY_INOUT)
+                                  and d.order == position_id]
+                    if open_deals:
+                        actual_pos_id = open_deals[0].position_id
+                        bot_deals = [d for d in all_close_deals if d.position_id == actual_pos_id]
+                        logger.warning(
+                            f"get_last_closed_trade: order_id={position_id} → "
+                            f"actual position_id={actual_pos_id} (broker dùng deal ticket)"
+                        )
+                    if not bot_deals:
+                        logger.warning(
+                            f"get_last_closed_trade: position_id={position_id} không tìm "
+                            f"được closing deal. Available: "
+                            f"{[(d.position_id, d.price) for d in all_close_deals[:3]]}"
+                        )
+                        return None
+            else:
+                bot_deals = all_close_deals
+
             if not bot_deals:
                 return None
             d = bot_deals[0]
