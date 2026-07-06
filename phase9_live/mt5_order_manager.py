@@ -275,6 +275,36 @@ class MT5OrderManager:
         return await self._run(_get)
 
     # ──────────────────────────────────────────────────────────
+    # GET POSITION BY TICKET
+    # ──────────────────────────────────────────────────────────
+    async def get_position_by_ticket(self, ticket: int) -> Optional[Dict]:
+        """Lấy position theo ticket cụ thể — dùng khi nhiều lệnh cùng symbol."""
+        mt5 = _mt5()
+
+        def _get():
+            positions = mt5.positions_get(ticket=ticket)
+            if not positions:
+                return None
+            p = positions[0]
+            mt5_sym = p.symbol
+            tick = mt5.symbol_info_tick(mt5_sym)
+            current = (tick.bid if p.type == mt5.POSITION_TYPE_BUY
+                       else tick.ask) if tick else p.price_current
+            return {
+                "ticket":  p.ticket,
+                "symbol":  mt5_sym,
+                "side":    "BUY" if p.type == mt5.POSITION_TYPE_BUY else "SELL",
+                "volume":  p.volume,
+                "entry":   p.price_open,
+                "sl":      p.sl,
+                "tp":      p.tp,
+                "profit":  p.profit,
+                "current": current,
+            }
+
+        return await self._run(_get)
+
+    # ──────────────────────────────────────────────────────────
     # GET ALL POSITIONS
     # ──────────────────────────────────────────────────────────
     async def get_all_positions(self) -> List[Dict]:

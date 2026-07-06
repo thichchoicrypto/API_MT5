@@ -91,17 +91,19 @@ class LivePositionMonitor:
 
     def track(self, order_result: Dict, signal: Dict, risk: Dict):
         pos = LivePosition(order_result, signal, risk)
-        self.open_positions[pos.symbol] = pos
-        logger.info(f"[Live] Tracking position: {pos.symbol} {pos.side} @ {pos.entry}")
+        # Key = order_id (không phải symbol) → cho phép nhiều lệnh cùng symbol
+        self.open_positions[pos.order_id] = pos
+        logger.info(f"[Live] Tracking position: {pos.symbol} {pos.side} @ {pos.entry} order_id={pos.order_id}")
 
     def restore(self, pos: "LivePosition"):
         """Restore một position đã được reconstruct từ DB."""
-        self.open_positions[pos.symbol] = pos
+        self.open_positions[pos.order_id] = pos
         logger.info(f"[Live] Restored position: {pos.symbol} {pos.side} @ {pos.entry} (order_id={pos.order_id})")
 
-    def remove(self, symbol: str):
-        if symbol in self.open_positions:
-            del self.open_positions[symbol]
+    def remove(self, order_id: str):
+        """Xoá position theo order_id."""
+        if order_id in self.open_positions:
+            del self.open_positions[order_id]
 
     def get_summary(self) -> List[Dict]:
         return [p.to_dict() for p in self.open_positions.values()]

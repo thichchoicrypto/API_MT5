@@ -47,7 +47,7 @@ _PROFILES = {
         "risk_per_trade":     0.02,
         "max_daily_loss":     0.06,
         "max_drawdown":       0.35,
-        "max_open_positions": 2,
+        "max_open_positions": 4,
         "max_leverage":       30,
     },
 }
