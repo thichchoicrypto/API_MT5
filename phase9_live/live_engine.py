@@ -244,12 +244,15 @@ class LiveTradingEngine:
 
                 # Startup orphan check: position đã restore từ DB nhưng MT5 đã đóng khi bot offline
                 # → gửi Telegram missed notification + update DB ngay tại startup
-                for symbol, pos in list(self.position_monitor.open_positions.items()):
+                for oid, pos in list(self.position_monitor.open_positions.items()):
+                    symbol = pos.symbol
                     try:
-                        mt5_check = await self.order_manager.get_position(symbol)
+                        ticket = int(pos.order_id) if pos.order_id else 0
+                        mt5_check = (await self.order_manager.get_position_by_ticket(ticket)
+                                     if ticket else await self.order_manager.get_position(symbol))
                         if mt5_check is None:
                             logger.warning(
-                                f"[Startup] {symbol} not in MT5 — closed while bot was offline"
+                                f"[Startup] {symbol} #{oid} not in MT5 — closed while bot was offline"
                             )
                             exit_price, pnl, status = await self._get_close_details(symbol, pos)
                             await telegram.send(
@@ -267,7 +270,7 @@ class LiveTradingEngine:
                                     status=status,
                                     balance=self.risk_engine.account_balance,
                                 )
-                            self.position_monitor.remove(symbol)
+                            self.position_monitor.remove(oid)
                     except Exception as e:
                         logger.error(f"[Startup] orphan check error for {symbol}: {e}")
         else:
@@ -277,9 +280,11 @@ class LiveTradingEngine:
         # Những position này không có trong DB (vì _finalize_entry chưa chạy)
         try:
             mt5_all = await self.order_manager.get_all_positions()
+            tracked_tickets = set(self.position_monitor.open_positions.keys())
             for p in mt5_all:
-                sym = p.get("symbol", "")
-                if sym and sym not in self.position_monitor.open_positions:
+                sym    = p.get("symbol", "")
+                ticket = str(p.get("ticket", 0))
+                if sym and ticket not in tracked_tickets:
                     logger.warning(
                         f"[Startup] Untracked MT5 position found: {sym} "
                         f"{p.get('side')} ticket=#{p.get('ticket')}"
@@ -621,9 +626,10 @@ class LiveTradingEngine:
             order_id = str(ticket)
 
             if is_market:
-                # MARKET fill ngay — lấy actual fill price từ MT5 để track đúng entry
+                # MARKET fill ngay — lấy actual fill price từ MT5 theo ticket cụ thể
+                # KHÔNG dùng get_position(symbol) vì sẽ trả về lệnh cũ khi có multi-position
                 self._placing_orders.discard(symbol)
-                mt5_pos = await self.order_manager.get_position(symbol)
+                mt5_pos = await self.order_manager.get_position_by_ticket(ticket)
                 if mt5_pos and mt5_pos.get("entry"):
                     signal = dict(signal)  # copy để không mutate original
                     signal["entry_price"] = mt5_pos["entry"]
@@ -790,7 +796,8 @@ class LiveTradingEngine:
         if not self.position_monitor.open_positions:
             return
 
-        for symbol, pos in list(self.position_monitor.open_positions.items()):
+        for order_id, pos in list(self.position_monitor.open_positions.items()):
+            symbol = pos.symbol
             try:
                 if pos.be_set:
                     continue
@@ -840,7 +847,8 @@ class LiveTradingEngine:
         if not self.position_monitor.open_positions:
             return
 
-        for symbol, pos in list(self.position_monitor.open_positions.items()):
+        for _oid, pos in list(self.position_monitor.open_positions.items()):
+            symbol = pos.symbol
             try:
                 if not pos.be_set:
                     continue  # chỉ trail sau khi BE đã set
@@ -1033,15 +1041,18 @@ class LiveTradingEngine:
         Nếu pos=None → đã đóng → fetch history qua get_last_closed_trade().
         Latency: tối đa 60s trễ sau khi TP/SL hit → acceptable cho scalping.
 
-        Lưu ý: position_monitor.open_positions dùng symbol làm key.
-        Nếu có cả LONG lẫn SHORT cùng symbol → overwrite (known bug, xem GUIDELINE section 26).
+        Key = order_id → cho phép nhiều lệnh cùng symbol (fixed).
         """
         if not self.position_monitor.open_positions:
             return
 
-        for symbol, pos in list(self.position_monitor.open_positions.items()):
+        for order_id, pos in list(self.position_monitor.open_positions.items()):
+            symbol = pos.symbol
             try:
-                mt5_pos  = await self.order_manager.get_position(symbol)
+                # Check theo ticket cụ thể — tránh nhầm với lệnh khác cùng symbol
+                ticket   = int(pos.order_id) if pos.order_id else 0
+                mt5_pos  = (await self.order_manager.get_position_by_ticket(ticket)
+                            if ticket else await self.order_manager.get_position(symbol))
                 pos_open = mt5_pos is not None
 
                 if not pos_open:
@@ -1067,7 +1078,6 @@ class LiveTradingEngine:
                             status=status,
                             balance=current_balance or self.risk_engine.account_balance,
                         )
-                        # Update candle_tracker_live outcome (chỉ update outcome columns, không đụng các cột khác)
                         if pos.candle_time:
                             await self._db.update_candle_tracker_outcome(
                                 symbol=symbol,
@@ -1083,7 +1093,7 @@ class LiveTradingEngine:
                     if pnl:
                         self.risk_engine.register_pnl(pnl)
 
-                    self.position_monitor.remove(symbol)
+                    self.position_monitor.remove(order_id)
 
             except Exception as e:
                 logger.error(f"_check_closed_positions error for {symbol}: {e}")
