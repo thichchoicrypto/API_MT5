@@ -110,7 +110,7 @@ BIAS_TIMEFRAME      = "1h"
 # ─────────────────────────────────────────────
 # DATA
 # ─────────────────────────────────────────────
-HISTORICAL_YEARS        = 5
+HISTORICAL_YEARS        = 3
 MAX_CANDLES_PER_REQUEST = 5000
 DATA_DELAY_THRESHOLD    = 1800
 
