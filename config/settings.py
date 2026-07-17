@@ -126,7 +126,7 @@ STALE_CLOSED_BAR_THRESHOLD = 1500
 BROKER_TZ_OFFSET = int(os.getenv("BROKER_TZ_OFFSET", "3"))
 
 # LIMIT order timeout (số candle)
-LIMIT_ORDER_TIMEOUT_CANDLES = int(os.getenv("LIMIT_ORDER_TIMEOUT_CANDLES", "7"))  # 3→5→7: thêm candle chờ fill LIMIT
+LIMIT_ORDER_TIMEOUT_CANDLES = int(os.getenv("LIMIT_ORDER_TIMEOUT_CANDLES", "10"))  # 10 candles × 15m = 150 phút = 2.5h
 
 WS_RECONNECT_DELAY = 5
 
@@ -135,7 +135,7 @@ WS_RECONNECT_DELAY = 5
 # ─────────────────────────────────────────────
 RISK_PER_TRADE     = _p["risk_per_trade"]
 MAX_DAILY_LOSS     = _p["max_daily_loss"]
-MAX_DRAWDOWN       = _p["max_drawdown"]
+MAX_DRAWDOWN       = float(os.getenv("MAX_DRAWDOWN", str(_p["max_drawdown"])))
 MAX_OPEN_POSITIONS = _p["max_open_positions"]
 MAX_LEVERAGE       = _p["max_leverage"]
 MIN_RR             = 1.5
