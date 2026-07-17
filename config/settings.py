@@ -102,8 +102,8 @@ DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NA
 # SYMBOLS & TIMEFRAMES
 # ─────────────────────────────────────────────
 SYMBOLS             = _p["symbols"]
-TIMEFRAMES          = ["5m", "1h"]   # 5m=entry, 1h=bias
-ENTRY_TIMEFRAME     = os.getenv("ENTRY_TIMEFRAME", "1h")   # 15m | 1h
+TIMEFRAMES          = ["15m", "1h"]   # 15m=entry, 1h=bias
+ENTRY_TIMEFRAME     = os.getenv("ENTRY_TIMEFRAME", "15m")   # 5m | 15m | 1h
 STRUCTURE_TIMEFRAME = ENTRY_TIMEFRAME
 BIAS_TIMEFRAME      = "1h"
 
@@ -148,7 +148,17 @@ SESSION_FILTER_ENABLED = os.getenv("SESSION_FILTER_ENABLED", "true").lower() == 
 # ─────────────────────────────────────────────
 # STRATEGY
 # ─────────────────────────────────────────────
-SWING_LOOKBACK        = 2
+SWING_LOOKBACK        = 3   # 2→3: SL rộng hơn, ít bị noise stop-out hơn
+
+# ─────────────────────────────────────────────
+# ADX 1H REGIME FILTER
+# Chỉ cho phép entry khi ADX(14) trên 1h > threshold → lọc macro sideways
+# ─────────────────────────────────────────────
+ADX_1H_FILTER_ENABLED = True
+ADX_1H_MIN            = 20    # ADX 1h < 20 = ranging macro → skip
+ADX_1H_MIN_OVERRIDE: dict = {
+    "XAUUSD": 18,   # Gold có thể trend ở ADX thấp hơn FX pairs
+}
 FVG_MIN_ATR_RATIO     = 0.2   # 0.3→0.2: chấp nhận FVG nhỏ hơn → ít no_zone hơn
 OB_LOOKBACK           = 20   # 10→15→20: tìm OB xa hơn → ít no_zone hơn
 VOLUME_THRESHOLD      = 0.5
@@ -274,7 +284,7 @@ YFINANCE_SYMBOL_MAP = {
     "EURGBP": "EURGBP=X",
     "EURJPY": "EURJPY=X",
     "GBPJPY": "GBPJPY=X",
-    "XAUUSD": "GC=F",    # Gold futures
+    "XAUUSD": "XAUUSD=X",  # Spot gold — gần ICMarkets hơn GC=F (futures có premium $5-15)
     "XAGUSD": "SI=F",    # Silver futures
 }
 

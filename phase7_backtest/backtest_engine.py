@@ -29,7 +29,10 @@ import random
 from typing import List, Dict, Optional, Callable
 from datetime import datetime
 from utils.logger import logger
-from config.settings import LIMIT_ORDER_TIMEOUT_CANDLES
+from config.settings import (
+    LIMIT_ORDER_TIMEOUT_CANDLES,
+    ADX_1H_FILTER_ENABLED, ADX_1H_MIN, ADX_1H_MIN_OVERRIDE,
+)
 from phase2_structure.structure_engine import StructureEngine
 from phase2_structure.mtf_bias import MTFBias
 from phase3_liquidity.liquidity_engine import build_liquidity_zones
@@ -41,6 +44,7 @@ from phase4_fvg_ob.orderblock_engine import detect_all_obs, update_ob_mitigation
 from phase4_fvg_ob.zone_builder import find_confluence_zones, build_entry_zone
 from phase5_entry.entry_engine import EntryEngine
 from phase6_risk.risk_engine import RiskEngine
+from phase5_entry.entry_engine import calc_adx
 
 
 # Forex: no exchange fees — cost is spread (already in mid price approximation)
@@ -204,6 +208,17 @@ class BacktestEngine:
             return "SHORT"
         return "NEUTRAL"
 
+    def _get_1h_adx(self) -> float:
+        """
+        Tính ADX(14) từ các nến 1h đã đóng tính đến thời điểm hiện tại.
+        Dùng self._idx_1h làm boundary — chỉ dùng candles đã advance (đã đóng).
+        Trả về 0.0 nếu chưa đủ data.
+        """
+        if not self._candles_1h or self._idx_1h < 28:   # cần ít nhất 2×period
+            return 0.0
+        window = self._candles_1h[max(0, self._idx_1h - 100): self._idx_1h]
+        return calc_adx(window, period=14)
+
     def run(self, candles: List[dict], warmup: int = 50) -> Dict:
         """
         Phase 7.4: Event-driven loop — one candle at a time.
@@ -360,6 +375,20 @@ class BacktestEngine:
             # News filter — skip signal nếu gần high-impact event
             if self._news_filter and self._news_filter.is_high_impact_window(current["open_time"]):
                 continue
+
+            # ── ADX 1H Regime Filter ─────────────────────────────────────────────
+            # Chỉ dùng candles 1h đã đóng (advance bởi _advance_mtf ở trên).
+            # Nếu ADX 1h < threshold → macro sideways → skip toàn bộ entry check.
+            _adx_1h = 0.0
+            if ADX_1H_FILTER_ENABLED and self._candles_1h:
+                _adx_1h = self._get_1h_adx()
+                _adx_1h_min = ADX_1H_MIN_OVERRIDE.get(self.symbol, ADX_1H_MIN)
+                if _adx_1h > 0 and _adx_1h < _adx_1h_min:
+                    logger.debug(
+                        f"[{self.symbol}] ADX_1H={_adx_1h:.1f} < {_adx_1h_min} "
+                        f"(macro ranging) → skip entry @ {current['open_time']}"
+                    )
+                    continue
 
             # ── Check for new entry ───────────────────────────────────────────────
             # Điều kiện: không trade mở, candle này chưa đóng trade (CHG-BT-002),

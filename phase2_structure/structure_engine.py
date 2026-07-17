@@ -8,6 +8,7 @@ from phase2_structure.market_structure import classify_structure, StructureMemor
 from phase2_structure.bos_detector import detect_bos, StructureStateMachine
 from phase2_structure.mtf_bias import MTFBias
 from utils.logger import logger
+from config.settings import SWING_LOOKBACK
 
 
 class StructureEngine:
@@ -16,7 +17,7 @@ class StructureEngine:
     Call update(candles) whenever new candles are available.
     """
 
-    def __init__(self, symbol: str, timeframe: str, swing_n: int = 2):
+    def __init__(self, symbol: str, timeframe: str, swing_n: int = SWING_LOOKBACK):
         self.symbol = symbol
         self.timeframe = timeframe
         self.swing_n = swing_n
