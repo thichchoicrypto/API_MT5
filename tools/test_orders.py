@@ -104,12 +104,21 @@ async def test_limit_order(om: MT5OrderManager):
         print("❌ LIMIT order FAILED")
         return
 
+    from utils.telegram import telegram
+    await telegram.send(
+        f"⏳ [TEST] LIMIT BUY {SYMBOL} pending\n"
+        f"  Entry : {entry:.5f}\n"
+        f"  SL    : {sl:.5f}\n"
+        f"  TP    : {tp:.5f}\n"
+        f"  Lots  : {VOLUME}L  ticket=#{ticket}"
+    )
     print(f"✅ LIMIT order pending — ticket #{ticket}")
     print(f"⏳ Chờ {CANCEL_AFTER}s rồi cancel...")
     await asyncio.sleep(CANCEL_AFTER)
 
     ok = await om.cancel_order(ticket)
     if ok:
+        await telegram.send(f"🚫 [TEST] LIMIT BUY {SYMBOL} cancelled\n  ticket=#{ticket}")
         print(f"✅ LIMIT order #{ticket} đã cancel")
     else:
         print(f"❌ Cancel FAILED — vào MT5 cancel tay ticket #{ticket}")

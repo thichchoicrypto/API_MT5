@@ -278,7 +278,7 @@ class EntryEngine:
         # XAUUSD + major FX pairs → OR (sweep OR CHOCH)
         # JPY crosses (USDJPY, EURJPY, GBPJPY) → AND (sweep AND CHOCH): stricter filter needed
         # OR logic for USDJPY caused WR to drop 51.5%→47%, DD explode to 37%, daily loss hit 17x
-        _AND_SYMBOLS = {"EURJPY", "GBPJPY", "USDJPY"}
+        _AND_SYMBOLS = {"EURJPY", "GBPJPY", "USDJPY"}  # XAUUSD dùng OR logic — gold hiếm khi có cả sweep lẫn choch
         use_or_logic = (self.symbol not in _AND_SYMBOLS)
 
         if side == "LONG":
@@ -341,6 +341,14 @@ class EntryEngine:
         else:
             sweep_ok = sweep and sweep["type"] == "SELL_SIDE_SWEEP"
             choch_ok = choch and choch["type"] == "BEARISH_CHOCH"
+
+        # XAUUSD SHORT: sweep alone is unreliable during gold uptrends.
+        # Data: SHORT with sweep+CHoCH = 44.2% WR (+$2786);
+        #       SHORT with sweep only  = 24.3% WR (-$1818).
+        # Require CHoCH confirmation for all XAUUSD SHORT entries.
+        _REQUIRE_CHOCH_SHORT = {"XAUUSD"}
+        if self.symbol in _REQUIRE_CHOCH_SHORT and side == "SHORT":
+            return bool(choch_ok)
 
         return bool(sweep_ok or choch_ok)
 

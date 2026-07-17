@@ -181,3 +181,128 @@
   tp / sl / be             : 318 / 253 / 198
   final_balance            : $56,443.01
 ══════════════════════════════════════════════════
+
+
+
+
+
+24/06/2026
+
+
+(.venv) ngocdang@MacBook-Pro API_MT5 % python3 main.py backtest --symbol XAUUSD --tf 15m
+python3 analyze_tracker.py --symbol XAUUSD --tf 15m
+2026-06-24 00:02:24 | INFO     | __main__ - MT5 Scalper | mode=backtest | OS=Mac/Linux | DATA_SOURCE=YFINANCE
+2026-06-24 00:02:24 | INFO     | phase1_data.database - Database connected and schema ensured
+2026-06-24 00:02:24 | INFO     | __main__ - Loading candles for XAUUSD 15m ...
+2026-06-24 00:02:24 | INFO     | __main__ - Running backtest on 45962 candles (2024-06-21 → 2026-06-19)
+2026-06-24 00:02:24 | INFO     | __main__ - candle_tracker_backtest truncated ✅
+2026-06-24 00:02:24 | INFO     | phase7_backtest.backtest_engine - Backtest started: XAUUSD 15m — 45962 candles
+2026-06-24 00:02:27 | WARNING  | phase6_risk.risk_engine - Daily loss limit hit (-754.93) — disabling trading
+2026-06-24 00:02:30 | WARNING  | phase6_risk.risk_engine - Daily loss limit hit (-778.56) — disabling trading
+2026-06-24 00:02:36 | WARNING  | phase6_risk.risk_engine - Daily loss limit hit (-1037.85) — disabling trading
+2026-06-24 00:02:40 | WARNING  | phase6_risk.risk_engine - Daily loss limit hit (-1067.55) — disabling trading
+2026-06-24 00:02:47 | WARNING  | phase6_risk.risk_engine - Daily loss limit hit (-2171.14) — disabling trading
+2026-06-24 00:02:49 | WARNING  | phase6_risk.risk_engine - Daily loss limit hit (-1793.99) — disabling trading
+2026-06-24 00:02:50 | WARNING  | phase6_risk.risk_engine - Daily loss limit hit (-1912.53) — disabling trading
+2026-06-24 00:03:04 | WARNING  | phase6_risk.risk_engine - Daily loss limit hit (-5069.37) — disabling trading
+2026-06-24 00:03:13 | INFO     | __main__ - Saving 84555 candle_tracker records ...
+2026-06-24 00:03:38 | INFO     | phase1_data.database - Saved 84555 candle_tracker_backtest records
+2026-06-24 00:03:38 | INFO     | __main__ - candle_tracker saved ✅
+2026-06-24 00:03:38 | INFO     | phase1_data.database - Database disconnected
+══════════════════════════════════════════════════
+  BACKTEST RESULTS — XAUUSD 15m
+  Period: 2024-06-21 → 2026-06-19
+══════════════════════════════════════════════════
+  total_trades             : 702
+  winrate                  : 0.5171
+  net_profit               : 104011.71
+  net_profit_pct           : 10.4012
+  profit_factor            : 1.5
+  max_drawdown             : 13252.89
+  max_drawdown_pct         : 0.1162
+  avg_R                    : 1.4
+  sharpe_ratio             : 2.44
+  tp_count                 : 366
+  sl_count                 : 281
+  be_count                 : 55
+  avg_win                  : 858.15
+  avg_loss                 : -612.08
+  PASSED                   : ✅ YES
+══════════════════════════════════════════════════
+  ── Quarterly Breakdown ──────────────────────────────
+  Quarter     Trades   Win%        P&L    Balance     DD%
+  ───────────────────────────────────────────────────────
+  2024-Q2         11    55%      +302      10302    2.2%  📈
+  2024-Q3        108    51%     +1816      12118   20.4%  📈
+  2024-Q4        101    49%     +3128      15247   20.3%  📈
+  2025-Q1         89    49%     +3916      19163    8.4%  📈
+  2025-Q2         85    53%    +10741      29904   19.7%  📈
+  2025-Q3         97    46%     +4897      34800   12.5%  📈
+  2025-Q4         70    61%    +30216      65017    4.1%  📈
+  2026-Q1         77    52%    +14614      79631   14.1%  📈
+  2026-Q2         64    56%    +34381     114012    0.0%  📈
+  ───────────────────────────────────────────────────────
+  TOTAL          702          +104012     114012
+2026-06-24 00:03:38 | INFO     | __main__ - Running walk-forward validation ...
+2026-06-24 00:03:38 | INFO     | phase7_backtest.walk_forward - Walk-forward fold 1/3: train=10724, test=4596
+2026-06-24 00:03:38 | INFO     | phase7_backtest.backtest_engine - Backtest started: XAUUSD 15m — 15320 candles
+2026-06-24 00:03:41 | WARNING  | phase6_risk.risk_engine - Daily loss limit hit (-609.64) — disabling trading
+2026-06-24 00:03:44 | INFO     | phase7_backtest.walk_forward - Walk-forward fold 2/3: train=10724, test=4596
+2026-06-24 00:03:44 | INFO     | phase7_backtest.backtest_engine - Backtest started: XAUUSD 15m — 15320 candles
+2026-06-24 00:03:50 | INFO     | phase7_backtest.walk_forward - Walk-forward fold 3/3: train=10724, test=4596
+2026-06-24 00:03:50 | INFO     | phase7_backtest.backtest_engine - Backtest started: XAUUSD 15m — 15320 candles
+  Walk-Forward:
+    avg_winrate: 0.5137
+    avg_profit_factor: 1.62
+    avg_max_dd: 0.1559
+    avg_net_profit_pct: 0.3132
+    consistent: False
+  Monte Carlo (1000 simulations):
+    median_final_balance: 114011.71
+    p5_final_balance: 114011.71
+    p95_final_balance: 114011.71
+    median_max_dd: 0.3661
+    p95_max_dd: 0.8973
+    ruin_probability: 0.0
+[INFO] Kết nối DB: XAUUSD 15m ...
+[INFO] Loaded 84555 records từ DB
+══════════════════════════════════════════════════════════
+  TRACKER ANALYSIS — XAUUSD 15m
+  Records trong DB: 84,555
+══════════════════════════════════════════════════════════
+  Tổng signals xử lý                      : 84,555
+  Signals đủ điều kiện (eligible)         : 907
+  ── Phân loại lệnh ──────────────────────────────
+  MARKET (khớp ngay)                      : 299
+  LIMIT (đặt chờ — pending)               : 205
+  LIMIT (đã khớp lệnh)                    : 403
+  Tổng lệnh khớp (MARKET + LIMIT filled)  : 702
+  ── Lý do hủy LIMIT ──────────────────────────────
+    structure_broken                      : 0
+    ob_invalidated                        : 0
+    limit_timeout (safety fallback)       : 205
+    limit_expired_eob                     : 0
+    lmt_already_pending (2nd LIMIT skip)  : 19
+  ── Lý do bị lọc (tất cả stop_reason) ──────────
+    l1_trend_fail                         : 15,482
+    no_zone                               : 13,839
+    l2_zone_fail                          : 9,046
+    risk_rejected                         : 4,052
+    adx_low_14                            : 2,947
+    adx_low_15                            : 2,811
+    adx_low_12                            : 2,715
+    adx_low_17                            : 2,640
+    adx_low_18                            : 2,618
+    adx_low_16                            : 2,607
+  ── Kết quả trades ───────────────────────────────
+  Tổng trades đã đóng                     : 702
+  TP / SL / BE                            : 366 / 281 / 55
+  Winrate                                 : 51.7%
+  Net PnL                                 : +104011.71 USD
+  Avg win                                 : +858.15
+  Avg loss                                : -612.08
+══════════════════════════════════════════════════════════
+[OK] CSV chi tiết: /Users/ngocdang/Claude/Projects/API_MT5/backtest_detail_XAUUSD_15m.csv
+     84,555 rows — mở bằng Excel để lọc theo order_type, stop_reason, pnl
+[OK] Tóm tắt theo tháng: /Users/ngocdang/Claude/Projects/API_MT5/backtest_monthly_XAUUSD_15m.csv
+(.venv) ngocdang@MacBook-Pro API_MT5 %
