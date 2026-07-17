@@ -329,7 +329,9 @@ class LiveTradingEngine:
                 from phase1_data.mt5_collector import MT5StreamingCollector as _Collector
         else:
                 from phase1_data.yfinance_collector import YFinanceStreamingCollector as _Collector
-        collector = _Collector(SYMBOLS, TIMEFRAMES, db, on_candle=self.on_candle)
+        # Collect 5m candles in addition to TIMEFRAMES (15m + 1h) for future use
+        _collect_tfs = list(set(TIMEFRAMES) | {"5m"})
+        collector = _Collector(SYMBOLS, _collect_tfs, db, on_candle=self.on_candle)
 
         # Run collector + monitor concurrently
         await asyncio.gather(
