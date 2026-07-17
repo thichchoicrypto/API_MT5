@@ -444,10 +444,10 @@ async def run_paper():
 
     paper = PaperTradingEngine(strategy_runner=_make_strategy_runner(), db=db)
 
-    collect_tfs_preload = list({ENTRY_TIMEFRAME, "1h"})
+    collect_tfs_preload = list({ENTRY_TIMEFRAME, "5m", "1h"})
     await paper.preload_from_db(db, SYMBOLS, collect_tfs_preload, limit=500)
 
-    collect_tfs = list({ENTRY_TIMEFRAME, "1h"})
+    collect_tfs = list({ENTRY_TIMEFRAME, "5m", "1h"})
     collector   = _get_collector(SYMBOLS, collect_tfs, db, on_candle=paper.on_candle)
 
     logger.info(f"Paper trading started [{DATA_SOURCE}]")
