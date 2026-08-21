@@ -510,6 +510,7 @@ class LiveTradingEngine:
                     "timeframe":       ENTRY_TIMEFRAME,
                     "candle_time":     current["open_time"],
                     "side":            side,
+                    "balance":         round(self.risk_engine.account_balance, 2),
                     "trend":           struct.get("trend"),
                     "last_swing_high": struct.get("last_swing_high"),
                     "last_swing_low":  struct.get("last_swing_low"),

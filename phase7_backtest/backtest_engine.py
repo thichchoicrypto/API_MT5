@@ -410,6 +410,7 @@ class BacktestEngine:
                         "timeframe":       self.timeframe,
                         "candle_time":     current["open_time"],
                         "side":            side,
+                        "balance":         round(balance, 2),
                         "trend":           struct.get("trend"),
                         "last_swing_high": struct.get("last_swing_high"),
                         "last_swing_low":  struct.get("last_swing_low"),
