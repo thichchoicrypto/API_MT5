@@ -219,7 +219,9 @@ class ForexRiskEngine:
             max_units = (self.account_balance * MAX_LEVERAGE) / entry
         units = min(units, max_units)
 
-        return round(units)  # OANDA accepts integer units
+        # Minimum 1 unit — tránh round về 0 khi balance nhỏ (vd: $100 demo)
+        # 1 unit XAUUSD = 1 oz = 0.01 lot → $0.01/pip, risk thực > risk_pct khi balance nhỏ
+        return max(1, round(units))  # OANDA accepts integer units
 
     # ─────────────────────────────────────────
     # FULL RISK EVALUATION
