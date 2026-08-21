@@ -99,16 +99,28 @@ class LiveTradingEngine:
         """Main entry point — sets up leverage and starts data collection."""
         self._db = db
         # MT5: không cần set_position_mode hay set_leverage (cấu hình trong MT5 terminal)
+
+        # Khởi tạo MT5 connection trước khi đọc balance
+        # (MT5StreamingCollector sẽ khởi tạo sau, nhưng cần balance ngay bây giờ)
+        from config.settings import DATA_SOURCE
+        if DATA_SOURCE == "MT5":
+            from phase1_data.mt5_collector import _init_mt5
+            loop = asyncio.get_event_loop()
+            mt5_ok = await loop.run_in_executor(None, _init_mt5)
+            if mt5_ok:
+                logger.info("MT5 initialized for balance read")
+            else:
+                logger.error("MT5 init failed — balance may be unavailable")
+
         # Load account balance — phải update cả peak_balance và _day_start_balance
         # để tránh false drawdown (default 10,000 vs actual balance)
-        # Retry đọc balance tối đa 10 lần (MT5 có thể chưa sẵn sàng ngay)
         balance = None
-        for _attempt in range(10):
+        for _attempt in range(5):
             balance = await self.order_manager.get_account_balance()
             if balance:
                 break
-            logger.warning(f"Balance read attempt {_attempt+1}/10 failed — retrying in 3s")
-            await asyncio.sleep(3)
+            logger.warning(f"Balance read attempt {_attempt+1}/5 failed — retrying in 2s")
+            await asyncio.sleep(2)
 
         if balance:
             self.risk_engine.account_balance = balance
@@ -116,7 +128,7 @@ class LiveTradingEngine:
             self.risk_engine._day_start_balance = balance
             logger.info(f"Account balance: ${balance:.2f}")
         else:
-            logger.error("Could not read balance after 10 attempts — kill switch may trigger!")
+            logger.error("Could not read balance after 5 attempts — kill switch may trigger!")
 
         await telegram.send(f"🚀 MT5 Live Trading Started | Balance: ${balance:.2f}" if balance else "🚀 MT5 Live Trading Started")
 
