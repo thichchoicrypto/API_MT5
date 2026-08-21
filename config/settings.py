@@ -43,11 +43,11 @@ _PROFILES = {
         "max_leverage":       30,
     },
     "AGGRESSIVE": {
-        "symbols":            ["XAUUSD", "XAGUSD"],
+        "symbols":            ["XAUUSD"],
         "risk_per_trade":     0.02,
         "max_daily_loss":     0.06,
         "max_drawdown":       0.35,
-        "max_open_positions": 4,
+        "max_open_positions": 99,  # không giới hạn
         "max_leverage":       30,
     },
 }
