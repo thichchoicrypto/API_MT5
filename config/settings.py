@@ -220,11 +220,8 @@ MIN_RR_OVERRIDE: dict = {
 # Default = 5. Higher for volatile pairs (XAUUSD/USDJPY) where SL chains
 # are more common due to higher TP targets (2.5R+) → harder to hit TP1 quickly
 # ─────────────────────────────────────────────
-CONSECUTIVE_LOSS_LIMIT: int = 5
-CONSECUTIVE_LOSS_LIMIT_OVERRIDE: dict = {
-    "XAUUSD": 8,   # 5→8: Gold volatile, longer losing streaks expected
-    "USDJPY": 7,   # same reasoning
-}
+CONSECUTIVE_LOSS_LIMIT: int = 999  # disabled
+CONSECUTIVE_LOSS_LIMIT_OVERRIDE: dict = {}
 
 # ─────────────────────────────────────────────
 # PAPER TRADING

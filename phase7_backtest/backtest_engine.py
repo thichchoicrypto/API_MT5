@@ -120,11 +120,10 @@ class BacktestEngine:
         self._idx_15m: int = 0
         self._idx_1h:  int = 0
 
-        # CHG-BT-006: Cho phép max 2 concurrent trades (AGGRESSIVE profile max_open_positions=2)
-        # Thay single _open_trade bằng list _open_trades
+        # CHG-BT-006: Concurrent trades — đọc từ settings (sync với live)
         self._open_trades: List[BacktestTrade] = []
-        MAX_OPEN_POSITIONS = 2  # từ AGGRESSIVE profile
-        self._max_open = MAX_OPEN_POSITIONS
+        from config.settings import MAX_OPEN_POSITIONS as _MAX_OPEN
+        self._max_open = _MAX_OPEN
         # CHG-BT-001: LIMIT pending state
         # Khi entry_type == "LIMIT", không fill ngay — lưu vào đây,
         # fill ở candle sau khi giá chạm midpoint.
