@@ -188,16 +188,18 @@ class EntryEngine:
         # ── Layer 3: Liquidity sweep or CHoCH ────────────────────────
         l3 = self._check_liquidity_context(side, liquidity_output)
         self.last_eval_debug["l3_liquidity"] = l3
-        if not l3:
-            self.last_eval_debug["stop_reason"] = "l3_liquidity_fail"
-            return None
+        # TEST: bỏ L3 filter — xem tác động
+        # if not l3:
+        #     self.last_eval_debug["stop_reason"] = "l3_liquidity_fail"
+        #     return None
 
         # ── Layer 4: Volume filter ────────────────────────────────────
         l4 = self._check_volume(candles)
         self.last_eval_debug["l4_volume"] = l4
-        if not l4:
-            self.last_eval_debug["stop_reason"] = "l4_volume_fail"
-            return None
+        # TEST: bỏ L4 filter — xem tác động
+        # if not l4:
+        #     self.last_eval_debug["stop_reason"] = "l4_volume_fail"
+        #     return None
 
         # ── Layer 5: Trigger candle ───────────────────────────────────
         trigger = classify_trigger(candles, side)
@@ -281,10 +283,14 @@ class EntryEngine:
         _AND_SYMBOLS = {"EURJPY", "GBPJPY", "USDJPY"}  # XAUUSD dùng OR logic — gold hiếm khi có cả sweep lẫn choch
         use_or_logic = (self.symbol not in _AND_SYMBOLS)
 
+        # Per-symbol: XAUUSD bỏ yêu cầu MTF bias — chỉ cần 15m trend đúng chiều
+        _IGNORE_MTF_BIAS = {"XAUUSD", "XAGUSD"}
+        ignore_bias = (self.symbol in _IGNORE_MTF_BIAS)
+
         if side == "LONG":
             # AND logic: cả 15m trend VÀ 1h MTF bias đều phải LONG
             # NEUTRAL bias: chỉ cần 15m trend UP (không có 1h confirmation rõ ràng)
-            if mtf_bias == "NEUTRAL":
+            if ignore_bias or mtf_bias == "NEUTRAL":
                 trend_ok = trend in ("UP", "UPTREND")
             else:
                 trend_ok = trend in ("UP", "UPTREND") and mtf_bias == "LONG"
@@ -297,7 +303,7 @@ class EntryEngine:
             return trend_ok or range_ok
 
         if side == "SHORT":
-            if mtf_bias == "NEUTRAL":
+            if ignore_bias or mtf_bias == "NEUTRAL":
                 trend_ok = trend in ("DOWN", "DOWNTREND")
             else:
                 trend_ok = trend in ("DOWN", "DOWNTREND") and mtf_bias == "SHORT"
@@ -342,14 +348,7 @@ class EntryEngine:
             sweep_ok = sweep and sweep["type"] == "SELL_SIDE_SWEEP"
             choch_ok = choch and choch["type"] == "BEARISH_CHOCH"
 
-        # XAUUSD SHORT: sweep alone is unreliable during gold uptrends.
-        # Data: SHORT with sweep+CHoCH = 44.2% WR (+$2786);
-        #       SHORT with sweep only  = 24.3% WR (-$1818).
-        # Require CHoCH confirmation for all XAUUSD SHORT entries.
-        _REQUIRE_CHOCH_SHORT = {"XAUUSD"}
-        if self.symbol in _REQUIRE_CHOCH_SHORT and side == "SHORT":
-            return bool(choch_ok)
-
+        # CHoCH requirement for SHORT removed — testing sweep OR choch for all sides
         return bool(sweep_ok or choch_ok)
 
     def _check_volume(self, candles: List[dict]) -> bool:

@@ -134,7 +134,7 @@ WS_RECONNECT_DELAY = 5
 # RISK  (from profile)
 # ─────────────────────────────────────────────
 RISK_PER_TRADE     = _p["risk_per_trade"]
-MAX_DAILY_LOSS     = _p["max_daily_loss"]
+MAX_DAILY_LOSS     = float(os.getenv("MAX_DAILY_LOSS", str(_p["max_daily_loss"])))
 MAX_DRAWDOWN       = float(os.getenv("MAX_DRAWDOWN", str(_p["max_drawdown"])))
 MAX_OPEN_POSITIONS = _p["max_open_positions"]
 MAX_LEVERAGE       = _p["max_leverage"]
@@ -157,7 +157,8 @@ SWING_LOOKBACK        = 3   # 2→3: SL rộng hơn, ít bị noise stop-out hơ
 ADX_1H_FILTER_ENABLED = True
 ADX_1H_MIN            = 20    # ADX 1h < 20 = ranging macro → skip
 ADX_1H_MIN_OVERRIDE: dict = {
-    "XAUUSD": 18,   # Gold có thể trend ở ADX thấp hơn FX pairs
+    "XAUUSD": 15,
+    "XAGUSD": 15,
 }
 FVG_MIN_ATR_RATIO     = 0.2   # 0.3→0.2: chấp nhận FVG nhỏ hơn → ít no_zone hơn
 OB_LOOKBACK           = 20   # 10→15→20: tìm OB xa hơn → ít no_zone hơn
@@ -171,14 +172,13 @@ SL_BUFFER             = 0.0005   # 0.05% of price — wider buffer to avoid stop
 # EURUSD/GBPUSD có ATR nhỏ hơn XAUUSD → threshold thấp hơn để giảm no_zone rejection
 # ─────────────────────────────────────────────
 FVG_MIN_ATR_RATIO_OVERRIDE: dict = {
-    "EURUSD": 0.1,   # 0.2→0.1: FX pairs có ATR nhỏ, cần threshold thấp hơn
-    "GBPUSD": 0.1,   # 0.2→0.1: same
-    "USDJPY": 0.15,  # 0.2→0.15: JPY pairs
+    "XAUUSD": 0.1,
+    "XAGUSD": 0.1,
 }
 
 OB_LOOKBACK_OVERRIDE: dict = {
-    "EURUSD": 25,    # 20→25: look further back for OBs on FX pairs
-    "GBPUSD": 25,    # 20→25: same
+    "XAUUSD": 30,
+    "XAGUSD": 30,
 }
 
 # ─────────────────────────────────────────────
@@ -201,9 +201,8 @@ RISK_PER_TRADE_OVERRIDE: dict = {
 # Default (FX pairs): (2.0, 2.5, 4.0)
 # ─────────────────────────────────────────────
 TP_MULTIPLIERS_OVERRIDE: dict = {
-    "XAUUSD": (2.5, 3.5, 5.0),   # test 2.5R TP1
-    "USDJPY": (2.5, 3.5, 5.0),   # JPY pairs volatile, TP xa hơn
-    # EURUSD/GBPUSD: default (2.0, 2.5, 4.0) — 2.5R không giúp nhiều, giữ nguyên
+    "XAUUSD": (2.5, 3.5, 5.0),
+    "XAGUSD": (2.5, 3.5, 5.0),
 }
 
 # ─────────────────────────────────────────────
@@ -212,8 +211,8 @@ TP_MULTIPLIERS_OVERRIDE: dict = {
 # XAUUSD/USDJPY: 2.0 — chỉ lấy setup có ít nhất 2R potential
 # ─────────────────────────────────────────────
 MIN_RR_OVERRIDE: dict = {
-    "XAUUSD": 2.0,  # 2.5R TP — chỉ lấy setup có RR >= 2.0
-    "USDJPY": 2.0,
+    "XAUUSD": 1.5,
+    "XAGUSD": 1.5,
 }
 
 # ─────────────────────────────────────────────

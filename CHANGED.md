@@ -1190,3 +1190,82 @@
 ---
 
 *CHANGED.md — tạo: 2026-06-09 (Conv 1 — Forex)*
+
+---
+
+## Conv MT5 — Backtest optimization: tăng trade frequency XAUUSD/XAGUSD (2026-08-21)
+
+**Baseline trước khi optimize:** XAUUSD 291 trades, Net +$8,777, PF 1.34, WF consistent True
+
+---
+
+### CHG-MT5-001 | Bỏ CHoCH SHORT requirement cho XAUUSD
+
+- **File:** `phase5_entry/entry_engine.py`
+- **Thay đổi:** Xóa `_REQUIRE_CHOCH_SHORT = {"XAUUSD"}` và block `if self.symbol in _REQUIRE_CHOCH_SHORT`. Layer 3 giờ dùng `sweep OR choch` cho cả LONG và SHORT, không yêu cầu CHoCH riêng cho SHORT.
+- **Kết quả:** 291 → 442 trades (+52%), PF giữ 1.34, WF consistent True
+
+---
+
+### CHG-MT5-002 | Tắt session filter
+
+- **File:** `.env`
+- **Thay đổi:** `SESSION_FILTER_ENABLED=false`
+- **Kết quả:** 442 → 472 trades, Net +$13,238, PF 1.35
+
+---
+
+### CHG-MT5-003 | Bỏ yêu cầu MTF bias cho XAUUSD và XAGUSD
+
+- **File:** `phase5_entry/entry_engine.py` — `_check_trend_alignment()`
+- **Thay đổi:** Thêm `_IGNORE_MTF_BIAS = {"XAUUSD", "XAGUSD"}`. Khi symbol thuộc set này, chỉ cần 15m trend đúng chiều, không cần 1h MTF bias align. Gold/Silver có macro driver riêng (USD strength, risk-off) không nhất thiết align với MTF bias ngắn hạn.
+- **Kết quả:** 472 → 476 trades, Net +$13,983, PF 1.36, Max DD 11.4%
+
+---
+
+### CHG-MT5-004 | Giảm FVG size threshold + tăng OB lookback cho XAUUSD/XAGUSD
+
+- **File:** `config/settings.py`
+- **Thay đổi:**
+  - `FVG_MIN_ATR_RATIO_OVERRIDE["XAUUSD"] = 0.1` (từ default 0.2)
+  - `FVG_MIN_ATR_RATIO_OVERRIDE["XAGUSD"] = 0.1`
+  - `OB_LOOKBACK_OVERRIDE["XAUUSD"] = 30` (từ default 20)
+  - `OB_LOOKBACK_OVERRIDE["XAGUSD"] = 30`
+- **Lý do:** Giảm `no_zone` rejection — FVG nhỏ hơn vẫn hợp lệ, tìm OB xa hơn về quá khứ
+- **Kết quả:** 476 → 512 trades, Net +$16,979, PF 1.37, Max DD **7.25%** ↓↓
+
+---
+
+### CHG-MT5-005 | Bỏ L3 (liquidity) và L4 (volume) filter
+
+- **File:** `phase5_entry/entry_engine.py` — `evaluate()`
+- **Thay đổi:** Comment out block `if not l3: return None` và `if not l4: return None`. L3/L4 vẫn được tính và log vào tracker (debug), nhưng không reject signal.
+- **Lý do:** Test cho thấy L3/L4 đang filter quá nhiều lệnh tốt — bỏ filter không làm giảm PF mà còn cải thiện
+- **Kết quả:** 512 → 661 trades, Net **+$31,902**, PF **1.44**, Max DD 6.37%, Sharpe 2.37, WF consistent True
+- **Cảnh báo:** L3 (sweep/CHoCH) là nguyên tắc cốt lõi SMC — cần monitor live kỹ
+
+---
+
+### CHG-MT5-006 | Cleanup per-symbol overrides — chỉ giữ XAUUSD và XAGUSD
+
+- **File:** `config/settings.py`
+- **Thay đổi:** Xóa override của EURUSD, GBPUSD, USDJPY khỏi:
+  - `ADX_1H_MIN_OVERRIDE`
+  - `FVG_MIN_ATR_RATIO_OVERRIDE`
+  - `OB_LOOKBACK_OVERRIDE`
+  - `TP_MULTIPLIERS_OVERRIDE`
+  - `MIN_RR_OVERRIDE`
+- **Lý do:** Chỉ trade XAUUSD và XAGUSD, các symbol khác dùng default
+
+---
+
+### Kết quả tổng hợp (XAUUSD, áp dụng tất cả thay đổi)
+
+| Metric | Trước | Sau |
+|---|---|---|
+| Trades (2 năm) | 291 | **661** |
+| Net profit | +$8,777 | **+$31,902** |
+| Profit Factor | 1.34 | **1.44** |
+| Max Drawdown | ~18% | **6.37%** |
+| Sharpe | — | **2.37** |
+| WF consistent | True | **True** |
