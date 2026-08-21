@@ -43,7 +43,7 @@ _PROFILES = {
         "max_leverage":       30,
     },
     "AGGRESSIVE": {
-        "symbols":            ["XAUUSD"],  # trial 5m — thêm lại AUDUSD/USDCHF sau khi test xong
+        "symbols":            ["XAUUSD", "XAGUSD"],
         "risk_per_trade":     0.02,
         "max_daily_loss":     0.06,
         "max_drawdown":       0.35,
