@@ -101,12 +101,22 @@ class LiveTradingEngine:
         # MT5: không cần set_position_mode hay set_leverage (cấu hình trong MT5 terminal)
         # Load account balance — phải update cả peak_balance và _day_start_balance
         # để tránh false drawdown (default 10,000 vs actual balance)
-        balance = await self.order_manager.get_account_balance()
+        # Retry đọc balance tối đa 10 lần (MT5 có thể chưa sẵn sàng ngay)
+        balance = None
+        for _attempt in range(10):
+            balance = await self.order_manager.get_account_balance()
+            if balance:
+                break
+            logger.warning(f"Balance read attempt {_attempt+1}/10 failed — retrying in 3s")
+            await asyncio.sleep(3)
+
         if balance:
             self.risk_engine.account_balance = balance
             self.risk_engine.peak_balance = balance
             self.risk_engine._day_start_balance = balance
             logger.info(f"Account balance: ${balance:.2f}")
+        else:
+            logger.error("Could not read balance after 10 attempts — kill switch may trigger!")
 
         await telegram.send(f"🚀 MT5 Live Trading Started | Balance: ${balance:.2f}" if balance else "🚀 MT5 Live Trading Started")
 
