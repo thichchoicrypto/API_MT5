@@ -47,12 +47,52 @@ from phase6_risk.risk_engine import RiskEngine
 from phase5_entry.entry_engine import calc_adx
 
 
-# Forex: no exchange fees — cost is spread (already in mid price approximation)
-# We add a small spread cost at entry for realism: ~1 pip per trade
-TAKER_FEE    = 0.0      # no taker fee for Forex
-MAKER_FEE    = 0.0      # no maker fee for Forex
-SLIPPAGE_PCT = 0.00005  # ~0.5 pip slippage on 1.0 price → ~$5 per standard lot
-SPREAD_COST_PCT = 0.00010  # ~1 pip spread cost at entry
+# ─────────────────────────────────────────────────────────────
+# REALISTIC FEE MODEL — ICMarkets Raw Spread (as of 2024)
+# ─────────────────────────────────────────────────────────────
+# 1. Commission: $3.5/lot/side → $7/lot round-trip
+#    Per unit (oz for XAU): $7 / contract_size
+# 2. Spread: typical bid/ask at entry (per unit in price terms)
+# 3. Slippage: entry + exit (market impact, especially on SL)
+# ─────────────────────────────────────────────────────────────
+
+TAKER_FEE    = 0.0      # no percentage taker fee for Forex (use commission below)
+MAKER_FEE    = 0.0
+
+# Slippage: applied at entry AND exit (SL fill can slip more than TP)
+SLIPPAGE_PCT     = 0.00005   # entry slippage ~0.5 pip
+EXIT_SLIPPAGE_PCT = 0.00003  # exit slippage ~0.3 pip (TP fills cleaner than SL)
+
+# Spread cost at entry (bid/ask): per unit in price terms
+# XAUUSD: ~$0.20/oz → at $2500 → pct = 0.20/2500 = 0.00008
+# FX pairs: ~1 pip → 0.00010
+SPREAD_COST_PCT = 0.00010   # default (FX pairs)
+
+# Commission per lot ROUND-TRIP (entry + exit combined), per symbol
+# ICMarkets Raw: $3.5/lot/side × 2 = $7/lot round-trip
+# Contract size (units per lot): XAUUSD=100oz, XAGUSD=5000oz, FX=100000
+_COMMISSION_PER_LOT_RT: dict = {
+    "XAUUSD": 7.0,   # $7/lot round-trip
+    "XAGUSD": 7.0,
+    "EURUSD": 7.0,
+    "GBPUSD": 7.0,
+    "USDJPY": 7.0,
+    "AUDUSD": 7.0,
+    "USDCAD": 7.0,
+    "USDCHF": 7.0,
+}
+_CONTRACT_SIZE: dict = {
+    "XAUUSD": 100,      # 100 oz per lot
+    "XAGUSD": 5_000,    # 5000 oz per lot
+}  # FX default = 100_000
+
+# Spread override per symbol (in price units, per unit of position)
+# XAUUSD: $0.20/oz → spread_per_unit = 0.20
+# FX: use SPREAD_COST_PCT × entry_price
+_SPREAD_PER_UNIT: dict = {
+    "XAUUSD": 0.20,   # $0.20 per oz
+    "XAGUSD": 0.005,  # $0.005 per oz
+}
 
 
 class BacktestTrade:
@@ -639,33 +679,49 @@ class BacktestEngine:
         return None
 
     def _calc_pnl(self, trade: BacktestTrade) -> float:
-        """Phase 7.8: Forex PnL.
-        No exchange fees — cost is bid/ask spread at entry (~1 pip).
-        Full exit at TP (2R) or SL/BE. No partial exit.
+        """Phase 7.8: Forex PnL — Realistic fee model (ICMarkets Raw).
+
+        Fees deducted:
+          1. Spread at entry  : bid/ask cost (per unit, symbol-specific)
+          2. Commission RT    : $7/lot round-trip (entry + exit combined)
+          3. Exit slippage    : ~0.3 pip additional on exit fill
 
         USD-quote pairs (EURUSD, GBPUSD, XAUUSD …):
           gross = price_change × units   (already in USD)
-          spread_cost = entry × SPREAD_COST_PCT × units
-
-        Non-USD-quote pairs (USDJPY, EURJPY, USDCAD …):
-          price_change is in quote currency → convert: gross = price_change × units / entry
-          spread_cost = SPREAD_COST_PCT × units   (~1 pip in USD terms)
+        Non-USD-quote pairs (USDJPY, USDCAD …):
+          gross = price_change × units / entry_price
         """
         if trade.exit_price is None:
             return 0.0
-        symbol = trade.signal.get("symbol", "EURUSD")
+        symbol   = trade.signal.get("symbol", "EURUSD")
         direction = 1 if trade.side == "LONG" else -1
-        price_change = (trade.exit_price - trade.entry_price) * direction
+        units    = trade.position_size
+
+        # ── Exit slippage (applied opposite to direction = adverse) ──
+        exit_slip = trade.exit_price * EXIT_SLIPPAGE_PCT * (-direction)
+        adj_exit  = trade.exit_price + exit_slip
+
+        price_change = (adj_exit - trade.entry_price) * direction
 
         _USD_QUOTE = {"EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "EURGBP", "XAUUSD", "XAGUSD"}
         if symbol not in _USD_QUOTE and trade.entry_price > 0:
-            gross = price_change * trade.position_size / trade.entry_price
-            spread_cost = SPREAD_COST_PCT * trade.position_size
+            gross = price_change * units / trade.entry_price
         else:
-            gross = price_change * trade.position_size
-            spread_cost = trade.entry_price * SPREAD_COST_PCT * trade.position_size
+            gross = price_change * units
 
-        return round(gross - spread_cost, 4)
+        # ── 1. Spread cost at entry ──────────────────────────────────
+        if symbol in _SPREAD_PER_UNIT:
+            spread_cost = _SPREAD_PER_UNIT[symbol] * units
+        else:
+            spread_cost = trade.entry_price * SPREAD_COST_PCT * units
+
+        # ── 2. Commission round-trip ─────────────────────────────────
+        contract = _CONTRACT_SIZE.get(symbol, 100_000)
+        lots     = units / contract
+        comm_rt  = _COMMISSION_PER_LOT_RT.get(symbol, 7.0) * lots
+
+        total_cost = spread_cost + comm_rt
+        return round(gross - total_cost, 4)
 
     def _compute_results(self) -> Dict:
         """Phase 7.10: Performance metrics."""
