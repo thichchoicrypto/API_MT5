@@ -711,9 +711,16 @@ class BacktestEngine:
 
         # ── 1. Spread cost at entry ──────────────────────────────────
         if symbol in _SPREAD_PER_UNIT:
+            # Per-unit override (XAUUSD: $0.20/oz, XAGUSD: $0.005/oz)
             spread_cost = _SPREAD_PER_UNIT[symbol] * units
-        else:
+        elif symbol in _USD_QUOTE:
+            # USD-quote FX (EURUSD, GBPUSD...): price ≈ 1.0 → entry × pct × units ≈ $1/pip
             spread_cost = trade.entry_price * SPREAD_COST_PCT * units
+        else:
+            # Non-USD-quote (USDJPY, USDCAD, USDCHF...): price in foreign currency
+            # spread in USD = SPREAD_COST_PCT × units (not × entry_price to avoid ×150 blowup)
+            # ~1 pip USD equivalent per unit, consistent with old formula
+            spread_cost = SPREAD_COST_PCT * units
 
         # ── 2. Commission round-trip ─────────────────────────────────
         contract = _CONTRACT_SIZE.get(symbol, 100_000)
