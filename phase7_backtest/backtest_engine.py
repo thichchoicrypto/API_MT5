@@ -501,11 +501,20 @@ class BacktestEngine:
                             self._tracker_records.append(tracker)
                         continue
 
+                    _sl  = risk_out.get("sl")
+                    _tp1 = risk_out["tp"][0]["level"] if risk_out.get("tp") else None
+                    _entry_mid = entry_zone["midpoint"]
+                    _sl_dist  = round(abs(_entry_mid - _sl), 5) if _sl else None
+                    _tp_dist  = round(abs(_tp1 - _entry_mid), 5) if _tp1 else None
+                    _lots     = round(risk_out.get("position_size", 0) / 100, 4) if risk_out.get("position_size") else None
                     tracker.update({
                         "l6_risk":    True,
-                        "sl":         risk_out.get("sl"),
-                        "tp1":        risk_out["tp"][0]["level"] if risk_out.get("tp") else None,
+                        "sl":         _sl,
+                        "tp1":        _tp1,
                         "rr":         risk_out.get("rr"),
+                        "sl_dist":    _sl_dist,
+                        "tp_dist":    _tp_dist,
+                        "lots":       _lots,
                     })
 
                     signal = self._entry_engine.evaluate(window, struct, liq_output, entry_zone, risk_out)
