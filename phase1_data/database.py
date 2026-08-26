@@ -109,6 +109,7 @@ CREATE TABLE IF NOT EXISTS candle_tracker_backtest (
     stop_reason     VARCHAR(50),
     eligible        BOOLEAN DEFAULT FALSE,
     balance         DOUBLE PRECISION,
+    risk_pct        DOUBLE PRECISION,
     created_at      TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (symbol, timeframe, candle_time, side)
 );
@@ -152,6 +153,7 @@ CREATE TABLE IF NOT EXISTS candle_tracker_live (
     stop_reason     VARCHAR(50),
     eligible        BOOLEAN DEFAULT FALSE,
     balance         DOUBLE PRECISION,
+    risk_pct        DOUBLE PRECISION,
     created_at      TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (symbol, timeframe, candle_time, side)
 );
@@ -160,8 +162,10 @@ CREATE INDEX IF NOT EXISTS idx_ct_live_symbol
     ON candle_tracker_live (symbol, timeframe, candle_time DESC);
 
 -- Migration: add balance column if not exists
-ALTER TABLE candle_tracker_backtest ADD COLUMN IF NOT EXISTS balance DOUBLE PRECISION;
-ALTER TABLE candle_tracker_live     ADD COLUMN IF NOT EXISTS balance DOUBLE PRECISION;
+ALTER TABLE candle_tracker_backtest ADD COLUMN IF NOT EXISTS balance  DOUBLE PRECISION;
+ALTER TABLE candle_tracker_live     ADD COLUMN IF NOT EXISTS balance  DOUBLE PRECISION;
+ALTER TABLE candle_tracker_backtest ADD COLUMN IF NOT EXISTS risk_pct DOUBLE PRECISION;
+ALTER TABLE candle_tracker_live     ADD COLUMN IF NOT EXISTS risk_pct DOUBLE PRECISION;
 """
 
 
@@ -434,12 +438,12 @@ class Database:
                 l6_risk, sl, tp1, rr,
                 signal_side, order_placed, order_type, entry_price,
                 trade_closed, exit_price, pnl, exit_reason,
-                stop_reason, eligible, balance
+                stop_reason, eligible, balance, risk_pct
             ) VALUES (
                 $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,
                 $12,$13,$14,$15,$16,$17,$18,$19,
                 $20,$21,$22,$23,$24,$25,$26,$27,
-                $28,$29,$30,$31,$32,$33,$34
+                $28,$29,$30,$31,$32,$33,$34,$35
             )
             ON CONFLICT (symbol, timeframe, candle_time, side)
             DO UPDATE SET
@@ -451,7 +455,7 @@ class Database:
                 l6_risk=$20, sl=$21, tp1=$22, rr=$23,
                 signal_side=$24, order_placed=$25, order_type=$26, entry_price=$27,
                 trade_closed=$28, exit_price=$29, pnl=$30, exit_reason=$31,
-                stop_reason=$32, eligible=$33, balance=$34
+                stop_reason=$32, eligible=$33, balance=$34, risk_pct=$35
         """
         try:
             async with self.pool.acquire() as conn:
@@ -479,6 +483,7 @@ class Database:
                     record.get("exit_reason"), record.get("stop_reason"),
                     _bool(record.get("eligible", False)),
                     record.get("balance"),
+                    record.get("risk_pct"),
                 )
         except Exception as e:
             logger.error(f"save_candle_tracker error: {e}")

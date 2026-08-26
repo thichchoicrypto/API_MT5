@@ -694,13 +694,31 @@ class LiveTradingEngine:
                     "tp_level":  tp_level,
                     "placed_at": datetime.now(tz=timezone.utc),
                 }
+                _lmt_entry   = signal["entry_price"]
+                _lmt_sl      = risk["sl"]
+                _lmt_bal     = self.risk_engine.account_balance or 1.0
+                _lmt_contract = {"XAUUSD": 100, "XAGUSD": 5_000}.get(symbol, 100_000)
+                _lmt_units   = qty * _lmt_contract
+                _lmt_sl_dist = abs(_lmt_sl - _lmt_entry)
+                _lmt_tp_dist = abs(tp_level - _lmt_entry)
+                _lmt_comm    = 7.0 * qty
+                _lmt_spread  = {"XAUUSD": 0.20, "XAGUSD": 0.005}.get(symbol, 0.0001 * _lmt_entry)
+                _lmt_fee     = _lmt_comm + _lmt_spread * _lmt_units * 2
+                _lmt_risk_gross = _lmt_sl_dist * _lmt_units
+                _lmt_tp_net  = _lmt_tp_dist * _lmt_units - _lmt_fee
+                _lmt_risk_pct = _lmt_risk_gross / _lmt_bal * 100
+                _lmt_notional = _lmt_entry * _lmt_units
                 await telegram.send(
-                    f"⏳ [LIVE] LIMIT pending {signal['side']} {symbol}\n"
-                    f"  Entry : {signal['entry_price']:.5f}\n"
-                    f"  SL    : {risk['sl']:.5f}\n"
-                    f"  TP    : {tp_level:.5f}\n"
-                    f"  Lots  : {qty:.2f}L  RR={risk['rr']:.1f}R\n"
-                    f"  TTL   : {LIMIT_ORDER_TIMEOUT_CANDLES} nến {ENTRY_TIMEFRAME}"
+                    f"⏳ [LIMIT] {signal['side']} {symbol}\n"
+                    f"  Entry     : {_lmt_entry:.2f}\n"
+                    f"  SL        : {_lmt_sl:.2f}\n"
+                    f"  TP        : {tp_level:.2f}\n"
+                    f"  RR        : {risk['rr']:.2f}\n"
+                    f"  TP profit : +${_lmt_tp_net:.2f}\n"
+                    f"  Risk@SL   : ${_lmt_risk_gross:.2f} + fee~${_lmt_fee:.2f} = ${_lmt_risk_gross + _lmt_fee:.2f} "
+                    f"({_lmt_risk_pct:.1f}% of ${_lmt_bal:.2f})\n"
+                    f"  Notional  : ${_lmt_notional:,.0f} ({qty:.2f}L)\n"
+                    f"  TTL       : {LIMIT_ORDER_TIMEOUT_CANDLES} nến {ENTRY_TIMEFRAME}"
                 )
         except Exception:
             logger.exception(f"[{symbol}] Exception in _execute_signal")
@@ -723,9 +741,45 @@ class LiveTradingEngine:
         bị gọi NGAY CẢ KHI LIMIT order chưa fill, khiến position_monitor +
         _check_closed_positions coi 1 LIMIT order chưa fill là "position đã
         bị đóng" (vì get_position() trả về None) -> false "CLOSED" event."""
-        msg = (f"📊 [LIVE] {signal['side']} {symbol} | "
-               f"Entry={signal['entry_price']:.2f} SL={risk['sl']:.2f} "
-               f"TP={tp_level:.2f} RR={risk['rr']:.1f}")
+        # ── Build detailed entry message ─────────────────────────
+        _entry   = signal["entry_price"]
+        _sl      = risk["sl"]
+        _lots    = risk["position_size"]
+        _balance = self.risk_engine.account_balance or 1.0
+        _side    = signal["side"]
+
+        _CONTRACT = {"XAUUSD": 100, "XAGUSD": 5_000}
+        _COMM_RT  = 7.0   # $7/lot RT (ICMarkets Raw)
+        _SPREAD   = {"XAUUSD": 0.20, "XAGUSD": 0.005}
+
+        contract  = _CONTRACT.get(symbol, 100_000)
+        units     = _lots * contract
+        sl_dist   = abs(_sl - _entry)
+        tp_dist   = abs(tp_level - _entry)
+
+        # Fee estimate: commission RT + spread (entry + exit)
+        comm_fee  = _COMM_RT * _lots
+        spread_u  = _SPREAD.get(symbol, 0.0001 * _entry)
+        spread_fee = spread_u * units * 2   # entry + exit spread
+        total_fee = comm_fee + spread_fee
+
+        risk_gross  = sl_dist * units           # gross $ at SL
+        tp_gross    = tp_dist * units           # gross $ at TP
+        tp_net      = tp_gross - total_fee
+        risk_pct    = risk_gross / _balance * 100
+        notional    = _entry * units
+
+        msg = (
+            f"⏳ [MARKET] {_side} {symbol}\n"
+            f"  Entry     : {_entry:.2f}\n"
+            f"  SL        : {_sl:.2f}\n"
+            f"  TP        : {tp_level:.2f}\n"
+            f"  RR        : {risk['rr']:.2f}\n"
+            f"  TP profit : +${tp_net:.2f}\n"
+            f"  Risk@SL   : ${risk_gross:.2f} + fee~${total_fee:.2f} = ${risk_gross + total_fee:.2f} "
+            f"({risk_pct:.1f}% of ${_balance:.2f})\n"
+            f"  Notional  : ${notional:,.0f} ({_lots:.2f}L)"
+        )
         logger.info(msg)
         await telegram.send(msg)
         self._api_errors = 0
@@ -761,9 +815,13 @@ class LiveTradingEngine:
                 else:
                     _balance_none_count += 1
                     logger.warning(f"[Monitor] balance=None (count={_balance_none_count})")
-                    if _balance_none_count == 3:  # alert sau 3 phút liên tiếp
+                    # Retry reconnect: lần đầu sau 3 phút, sau đó mỗi 30 phút
+                    _should_retry = (_balance_none_count == 3) or (
+                        _balance_none_count > 3 and (_balance_none_count - 3) % 30 == 0
+                    )
+                    if _should_retry:
                         await telegram.send(
-                            "⚠️ MT5 API mất kết nối — đang thử reconnect..."
+                            f"⚠️ MT5 API mất kết nối (count={_balance_none_count}) — đang thử reconnect..."
                         )
                         logger.warning("[Monitor] Attempting MT5 reconnect ...")
                         ok = await self.order_manager.reconnect()
@@ -773,7 +831,7 @@ class LiveTradingEngine:
                         else:
                             logger.error("[Monitor] MT5 reconnect FAILED")
                             await telegram.send(
-                                "🔴 MT5 reconnect thất bại!\n"
+                                f"🔴 MT5 reconnect thất bại (count={_balance_none_count})!\n"
                                 "Bot KHÔNG THỂ đặt lệnh. Cần restart thủ công."
                             )
 
@@ -1096,11 +1154,13 @@ class LiveTradingEngine:
                     exit_price, pnl, status = await self._get_close_details(symbol, pos)
 
                     icon = "✅" if pnl and pnl > 0 else ("🔴" if pnl and pnl < 0 else "⚪")
+                    _bal_after = (current_balance or self.risk_engine.account_balance) or 0.0
                     msg = (
                         f"{icon} [LIVE] {status} {pos.side} {symbol}\n"
-                        f"  Exit  : {exit_price:.5f}\n"
-                        f"  P&L   : ${pnl:+.2f}\n"
-                        f"  Entry : {pos.entry:.5f}"
+                        f"  Entry   : {pos.entry:.5f}\n"
+                        f"  Exit    : {exit_price:.5f}\n"
+                        f"  P&L     : ${pnl:+.2f}\n"
+                        f"  Balance : ${_bal_after:.2f}"
                     )
                     logger.info(msg)
                     await telegram.send(msg)

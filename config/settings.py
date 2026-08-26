@@ -201,8 +201,8 @@ RISK_PER_TRADE_OVERRIDE: dict = {
 # Default (FX pairs): (2.0, 2.5, 4.0)
 # ─────────────────────────────────────────────
 TP_MULTIPLIERS_OVERRIDE: dict = {
-    "XAUUSD": (2.5, 3.5, 5.0),
-    "XAGUSD": (2.5, 3.5, 5.0),
+    "XAUUSD": (1.0, 1.5, 2.0),   # TEST 1R
+    "XAGUSD": (1.0, 1.5, 2.0),   # TEST 1R
 }
 
 # ─────────────────────────────────────────────
@@ -211,8 +211,8 @@ TP_MULTIPLIERS_OVERRIDE: dict = {
 # XAUUSD/USDJPY: 2.0 — chỉ lấy setup có ít nhất 2R potential
 # ─────────────────────────────────────────────
 MIN_RR_OVERRIDE: dict = {
-    "XAUUSD": 1.5,
-    "XAGUSD": 1.5,
+    "XAUUSD": 0.8,   # TEST 1R
+    "XAGUSD": 0.8,   # TEST 1R
 }
 
 # ─────────────────────────────────────────────
@@ -222,6 +222,15 @@ MIN_RR_OVERRIDE: dict = {
 # ─────────────────────────────────────────────
 CONSECUTIVE_LOSS_LIMIT: int = 999  # disabled
 CONSECUTIVE_LOSS_LIMIT_OVERRIDE: dict = {}
+
+# ─────────────────────────────────────────────
+# ANTI-MARTINGALE POSITION SIZING
+# Tăng risk sau mỗi lần thắng, reset về base khi thua.
+# Bật: ANTI_MARTINGALE_ENABLED=true trong .env
+# ─────────────────────────────────────────────
+ANTI_MARTINGALE_ENABLED: bool = os.getenv("ANTI_MARTINGALE_ENABLED", "false").lower() == "true"
+ANTI_MARTINGALE_STEP:    float = 0.01    # +1% risk mỗi lần win liên tiếp
+ANTI_MARTINGALE_CAP:     float = 0.05    # tối đa 5% risk (5× base 1%)
 
 # ─────────────────────────────────────────────
 # PAPER TRADING

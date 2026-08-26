@@ -219,9 +219,24 @@ class ForexRiskEngine:
             max_units = (self.account_balance * MAX_LEVERAGE) / entry
         units = min(units, max_units)
 
-        # Minimum 1 unit — tránh round về 0 khi balance nhỏ (vd: $100 demo)
-        # 1 unit XAUUSD = 1 oz = 0.01 lot → $0.01/pip, risk thực > risk_pct khi balance nhỏ
-        return max(1, round(units))  # OANDA accepts integer units
+        units_rounded = round(units)
+        if units_rounded < 1:
+            # units < 0.5 → position quá nhỏ, reject
+            logger.debug(f"[{symbol}] units={units:.3f} < 1 → position_size=0 (balance too small)")
+            return 0.0
+
+        # Kiểm tra actual risk khi dùng min lot (1 unit)
+        # Nếu actual risk > 10% balance → từ chối thay vì force vào lệnh quá lớn
+        _min_unit_risk = sl_distance * units_rounded
+        _max_risk = self.account_balance * 0.10   # hard cap 10% per trade
+        if _min_unit_risk > _max_risk:
+            logger.warning(
+                f"[{symbol}] Min-lot risk ${_min_unit_risk:.2f} > 10% balance "
+                f"(${_max_risk:.2f}) — reject (balance too small for this symbol)"
+            )
+            return 0.0
+
+        return float(units_rounded)
 
     # ─────────────────────────────────────────
     # FULL RISK EVALUATION
@@ -250,7 +265,9 @@ class ForexRiskEngine:
         if not tps:
             return None
 
-        _risk_pct = RISK_PER_TRADE_OVERRIDE.get(symbol, RISK_PER_TRADE)
+        # Anti-Martingale override (set by backtest engine nếu enabled)
+        _am_override = getattr(self, "_am_override_risk", None)
+        _risk_pct = _am_override if _am_override is not None else RISK_PER_TRADE_OVERRIDE.get(symbol, RISK_PER_TRADE)
         position_size = self.calc_position_size(symbol, entry, sl, risk_pct=_risk_pct)
         if position_size <= 0:
             return None

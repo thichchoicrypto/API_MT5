@@ -173,6 +173,14 @@ class BacktestEngine:
         self._fvgs: List[Dict] = []
         self._obs: List[Dict] = []
 
+        # Anti-Martingale: track consecutive wins
+        from config.settings import (ANTI_MARTINGALE_ENABLED, ANTI_MARTINGALE_STEP,
+                                     ANTI_MARTINGALE_CAP)
+        self._am_enabled  = ANTI_MARTINGALE_ENABLED
+        self._am_step     = ANTI_MARTINGALE_STEP
+        self._am_cap      = ANTI_MARTINGALE_CAP
+        self._am_wins     = 0   # consecutive win counter
+
         # TTL memory: giữ sweep/CHoCH N candles sau khi detect
         # Tại sao cần TTL?
         #   Sweep/CHoCH thường xảy ra 1-3 candles trước entry signal thật sự.
@@ -410,6 +418,12 @@ class BacktestEngine:
                     self._equity.append({"time": current["open_time"], "balance": balance})
                     self._open_trades.remove(trade)
                     _just_closed = True
+                    # Anti-Martingale: update consecutive win counter
+                    if self._am_enabled:
+                        if pnl > 0:
+                            self._am_wins += 1
+                        else:
+                            self._am_wins = 0
 
             # News filter — skip signal nếu gần high-impact event
             if self._news_filter and self._news_filter.is_high_impact_window(current["open_time"]):
@@ -468,6 +482,17 @@ class BacktestEngine:
                             self._tracker_records.append(tracker)
                         continue
 
+                    # Anti-Martingale: dynamic risk_pct
+                    if self._am_enabled:
+                        from config.settings import RISK_PER_TRADE_OVERRIDE, RISK_PER_TRADE
+                        _base_risk = RISK_PER_TRADE_OVERRIDE.get(self.symbol, RISK_PER_TRADE)
+                        _am_risk = min(_base_risk + self._am_wins * self._am_step, self._am_cap)
+                        self._risk._am_override_risk = _am_risk
+                    else:
+                        from config.settings import RISK_PER_TRADE_OVERRIDE, RISK_PER_TRADE
+                        _am_risk = RISK_PER_TRADE_OVERRIDE.get(self.symbol, RISK_PER_TRADE)
+                        self._risk._am_override_risk = None
+                    tracker["risk_pct"] = round(_am_risk * 100, 2)  # lưu dạng % (1.0, 1.5, 2.0...)
                     risk_out = self._risk.evaluate(side, self.symbol, entry_zone["midpoint"], window, struct, liq_zones)
                     if risk_out is None:
                         tracker["stop_reason"] = "risk_rejected"

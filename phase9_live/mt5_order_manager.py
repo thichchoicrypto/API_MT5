@@ -127,13 +127,8 @@ class MT5OrderManager:
             f"✅ Order placed {symbol} {side} {volume:.2f}lots ticket={ticket}"
         )
         if order_type == "MARKET":
-            await telegram.send(
-                f"✅ [LIVE] MARKET {side} {symbol} filled\n"
-                f"  Entry  : {result.price:.5f}\n"
-                f"  SL     : {sl:.5f}\n"
-                f"  TP     : {tp:.5f}\n"
-                f"  Lots   : {volume:.2f}L  ticket=#{ticket}"
-            )
+            # Không gửi Telegram ở đây — _finalize_entry sẽ gửi message đầy đủ
+            pass
         # LIMIT placed message is sent by live_engine (_pending_limit_orders block)
         return ticket
 
@@ -381,11 +376,10 @@ class MT5OrderManager:
             if not deals:
                 return None
 
-            # Lấy tất cả CLOSE deals của bot
+            # Lấy tất cả CLOSE deals (kể cả manual close — magic=0)
             all_close_deals = sorted(
                 [d for d in deals
-                 if d.magic == BOT_MAGIC
-                 and d.entry == mt5.DEAL_ENTRY_OUT],
+                 if d.entry == mt5.DEAL_ENTRY_OUT],
                 key=lambda d: d.time, reverse=True
             )
             if not all_close_deals:
@@ -412,10 +406,15 @@ class MT5OrderManager:
                     if not bot_deals:
                         logger.warning(
                             f"get_last_closed_trade: position_id={position_id} không tìm "
-                            f"được closing deal. Available: "
-                            f"{[(d.position_id, d.price) for d in all_close_deals[:3]]}"
+                            f"được closing deal. Available position_ids: "
+                            f"{[(d.position_id, d.price, d.time) for d in all_close_deals[:5]]}"
                         )
-                        return None
+                        # Last resort: lấy deal mới nhất cho symbol (khi chỉ có 1 vị thế)
+                        if len(all_close_deals) == 1:
+                            logger.warning("get_last_closed_trade: using most recent deal as fallback")
+                            bot_deals = all_close_deals
+                        else:
+                            return None
             else:
                 bot_deals = all_close_deals
 
