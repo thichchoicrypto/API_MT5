@@ -1,3 +1,61 @@
+
+
+# #------------------------------------------------FOREX LỆNH---------------------------------------------------#
+# Từ ngày đến ngày cụ thể
+ANTI_MARTINGALE_ENABLED=true python main.py backtest --symbol XAUUSD --balance 1000 --from 2026-08-27 --to 2026-08-31
+
+# Chỉ từ ngày (đến hết data)
+ANTI_MARTINGALE_ENABLED=true python main.py backtest --symbol XAUUSD --balance 1000 --from 2026-01-01
+
+# Chỉ đến ngày
+ANTI_MARTINGALE_ENABLED=true python main.py backtest --symbol XAUUSD --balance 1000 --to 2024-12-31
+
+# push code MAC -> Git
+cd ~/Claude/Projects/API_MT5
+git add -A
+git commit -m "mô tả thay đổi"
+git push
+
+# pull code git -> VPS
+
+
+# VPS
+cd C:\Projects\API_MT5
+git pull origin main
+Stop-ScheduledTask -TaskName "MT5_Watchdog"
+Stop-Process -Name python -Force -ErrorAction SilentlyContinue
+Start-Sleep 3
+Start-ScheduledTask -TaskName "MT5_Bot"
+Start-Sleep 15
+Start-ScheduledTask -TaskName "MT5_Watchdog"
+
+# VPS
+cd C:\Projects\API_MT5
+git pull origin main
+
+
+
+----
+# 1. Stop watchdog trước
+Stop-ScheduledTask -TaskName "MT5_Watchdog"
+
+# 2. Kill bot
+Stop-Process -Name "python" -Force -ErrorAction SilentlyContinue
+
+# 3. Mở MT5 → login thủ công vào ICMarketsSC-Demo account
+#    (File → Login to Trade Account, tick Save password)
+
+# 4. Sau khi MT5 login xong, start lại
+Start-ScheduledTask -TaskName "MT5_Bot"
+Start-Sleep 15
+Start-ScheduledTask -TaskName "MT5_Watchdog"
+
+
+
+
+
+
+
 (venv) PS C:\Projects\API_MT5> python main.py backtest
 2026-06-20 19:56:40 | INFO     | __main__ - MT5 Scalper | mode=backtest | OS=Windows | DATA_SOURCE=MT5
 2026-06-20 19:56:40 | INFO     | phase1_data.database - Database connected and schema ensured

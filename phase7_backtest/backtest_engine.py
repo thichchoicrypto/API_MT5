@@ -32,6 +32,7 @@ from utils.logger import logger
 from config.settings import (
     LIMIT_ORDER_TIMEOUT_CANDLES,
     ADX_1H_FILTER_ENABLED, ADX_1H_MIN, ADX_1H_MIN_OVERRIDE,
+    MARKET_ORDERS_ENABLED,
 )
 from phase2_structure.structure_engine import StructureEngine
 from phase2_structure.mtf_bias import MTFBias
@@ -60,8 +61,10 @@ TAKER_FEE    = 0.0      # no percentage taker fee for Forex (use commission belo
 MAKER_FEE    = 0.0
 
 # Slippage: applied at entry AND exit (SL fill can slip more than TP)
-SLIPPAGE_PCT     = 0.00005   # entry slippage ~0.5 pip
-EXIT_SLIPPAGE_PCT = 0.00003  # exit slippage ~0.3 pip (TP fills cleaner than SL)
+SLIPPAGE_PCT         = 0.00005   # entry slippage ~0.5 pip
+TP_SLIPPAGE_PCT      = 0.0       # TP = limit order → fill đúng giá, không slip
+SL_SLIPPAGE_PCT      = 0.0001    # SL = stop→market order → slip ~0.5pt tại $4640
+EXIT_SLIPPAGE_PCT    = 0.00003   # fallback (BE, manual close)
 
 # Spread cost at entry (bid/ask): per unit in price terms
 # XAUUSD: ~$0.20/oz → at $2500 → pct = 0.20/2500 = 0.00008
@@ -547,10 +550,28 @@ class BacktestEngine:
                                 self._tracker_records.append(tracker)
                             continue
 
-                        raw_price  = entry_zone["midpoint"]
-                        slip       = raw_price * self.slippage * (1 if side == "LONG" else -1)
-                        entry_price = raw_price + slip
                         entry_type  = signal.get("entry_type", "MARKET")
+
+                        # MARKET disabled toàn hệ thống → skip, chỉ cho phép LIMIT
+                        if entry_type == "MARKET" and not MARKET_ORDERS_ENABLED:
+                            tracker["stop_reason"] = "market_disabled"
+                            if self.enable_tracker:
+                                self._tracker_records.append(tracker)
+                            continue
+
+                        if entry_type == "MARKET":
+                            # MARKET: fill tại bar close — giống live.
+                            # Live: signal fire cuối nến, MARKET order fill ở tick tiếp theo ≈ bar close.
+                            # SL/TP giữ nguyên absolute prices từ risk engine (tính từ midpoint).
+                            # Hệ quả: SL dist từ fill < SL dist từ midpoint → stop-out nhiều hơn.
+                            # Đây là behavior ĐÚNG — MARKET orders thực tế kém LIMIT orders.
+                            raw_price = current["close"]
+                        else:
+                            # LIMIT: fill tại zone midpoint (price phải return về midpoint).
+                            # Giống live: LIMIT order chờ price chạm midpoint mới khớp.
+                            raw_price = entry_zone["midpoint"]
+                        slip        = raw_price * self.slippage * (1 if side == "LONG" else -1)
+                        entry_price = raw_price + slip
 
                         if entry_type == "LIMIT":
                             # CHG-BT-004c: Không đặt 2 LIMIT đồng thời
@@ -731,8 +752,15 @@ class BacktestEngine:
         direction = 1 if trade.side == "LONG" else -1
         units    = trade.position_size
 
-        # ── Exit slippage (applied opposite to direction = adverse) ──
-        exit_slip = trade.exit_price * EXIT_SLIPPAGE_PCT * (-direction)
+        # ── Exit slippage: TP=limit(no slip), SL=stop→market(slip) ──
+        _exit_status = getattr(trade, "status", "") or ""
+        if "TP" in _exit_status:
+            _slip_pct = TP_SLIPPAGE_PCT
+        elif "SL" in _exit_status:
+            _slip_pct = SL_SLIPPAGE_PCT
+        else:
+            _slip_pct = EXIT_SLIPPAGE_PCT
+        exit_slip = trade.exit_price * _slip_pct * (-direction)
         adj_exit  = trade.exit_price + exit_slip
 
         price_change = (adj_exit - trade.entry_price) * direction

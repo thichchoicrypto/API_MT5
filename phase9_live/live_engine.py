@@ -10,7 +10,7 @@ from utils.telegram import telegram
 from config.settings import (
     SYMBOLS, TIMEFRAMES, ENTRY_TIMEFRAME, STRUCTURE_TIMEFRAME,
     BIAS_TIMEFRAME, MAX_OPEN_POSITIONS, MAX_LEVERAGE, RISK_PER_TRADE,
-    LIMIT_ORDER_TIMEOUT_CANDLES,
+    LIMIT_ORDER_TIMEOUT_CANDLES, MARKET_ORDERS_ENABLED,
 )
 from phase2_structure.structure_engine import StructureEngine
 from phase2_structure.mtf_bias import MTFBias
@@ -576,6 +576,19 @@ class LiveTradingEngine:
                 })
 
                 if signal:
+                    # MARKET order disabled toàn hệ thống → skip, chờ LIMIT setup
+                    if signal.get("entry_type") == "MARKET" and not MARKET_ORDERS_ENABLED:
+                        logger.info(f"[{symbol}] MARKET order disabled (LIMIT_ORDER_ONLY) — skip")
+                        tracker.update({
+                            "signal_side":  side,
+                            "order_placed": False,
+                            "order_type":   "MARKET",
+                            "stop_reason":  "market_disabled",
+                            "eligible":     True,
+                        })
+                        await self._save_tracker(tracker)
+                        continue
+
                     signal["candle_time"] = current["open_time"]  # để link với tracker row khi đóng lệnh
                     tracker.update({
                         "signal_side":  side,
@@ -753,7 +766,7 @@ class LiveTradingEngine:
         # ── Build detailed entry message ─────────────────────────
         _entry   = signal["entry_price"]
         _sl      = risk["sl"]
-        _lots    = risk["position_size"]
+        _lots    = risk["position_size"] / 100   # convert units → lots (e.g. 1 unit → 0.01L)
         _balance = self.risk_engine.account_balance or 1.0
         _side    = signal["side"]
 
@@ -778,15 +791,17 @@ class LiveTradingEngine:
         risk_pct    = risk_gross / _balance * 100
         notional    = _entry * units
 
+        _target_risk_pct = risk.get("risk", 0) * 100   # target risk% từ anti-martingale
         msg = (
             f"⏳ [MARKET] {_side} {symbol}\n"
             f"  Entry     : {_entry:.2f}\n"
-            f"  SL        : {_sl:.2f}\n"
-            f"  TP        : {tp_level:.2f}\n"
+            f"  SL        : {_sl:.2f}  ({sl_dist:.2f}pt)\n"
+            f"  TP        : {tp_level:.2f}  ({tp_dist:.2f}pt)\n"
             f"  RR        : {risk['rr']:.2f}\n"
+            f"  Lots      : {_lots:.2f}L  ({units:.0f} oz)\n"
+            f"  Risk      : {_target_risk_pct:.1f}% target → ${risk_gross:.2f} actual ({risk_pct:.1f}% of ${_balance:.2f})\n"
             f"  TP profit : +${tp_net:.2f}\n"
-            f"  Risk@SL   : ${risk_gross:.2f} + fee~${total_fee:.2f} = ${risk_gross + total_fee:.2f} "
-            f"({risk_pct:.1f}% of ${_balance:.2f})\n"
+            f"  Risk@SL   : ${risk_gross:.2f} + fee~${total_fee:.2f} = ${risk_gross + total_fee:.2f}\n"
             f"  Notional  : ${notional:,.0f} ({_lots:.2f}L)"
         )
         logger.info(msg)

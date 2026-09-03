@@ -174,45 +174,47 @@ SL_BUFFER             = 0.0005   # 0.05% of price — wider buffer to avoid stop
 FVG_MIN_ATR_RATIO_OVERRIDE: dict = {
     "XAUUSD": 0.1,
     "XAGUSD": 0.1,
+    "EURUSD": 0.1,
+    "GBPUSD": 0.1,
 }
 
 OB_LOOKBACK_OVERRIDE: dict = {
     "XAUUSD": 30,
     "XAGUSD": 30,
+    "EURUSD": 30,
+    "GBPUSD": 30,
 }
 
 # ─────────────────────────────────────────────
 # OPTION B: Per-symbol risk_per_trade overrides
-# XAUUSD: 2%→1% để giảm MC p95 DD từ 80%→~40%
-# GBPUSD: 2%→1% để giảm DD (consistent=False)
-# EURUSD: 2%→1.5% để giảm DD nhẹ
 # ─────────────────────────────────────────────
 RISK_PER_TRADE_OVERRIDE: dict = {
-    "XAUUSD": 0.01,   # 1% — giảm DD từ 37% → ~19%
-    "GBPUSD": 0.01,   # 1% — reduce DD, improve consistency
-    "EURUSD": 0.015,  # 1.5% — slight reduction
-    "USDCHF": 0.01,   # 1% — MC p95 DD 51.9% at 2%, reduce risk
-    "AUDUSD": 0.015,  # 1.5% — MC p95 DD 31.9%, slight reduction
+    "XAUUSD": 0.01,   # 1%
+    "XAGUSD": 0.01,
+    "EURUSD": 0.01,   # 1% — align với XAUUSD config
+    "GBPUSD": 0.01,
+    "USDCHF": 0.01,
+    "AUDUSD": 0.01,
 }
 
 # ─────────────────────────────────────────────
 # Per-symbol TP multipliers: (tp1_R, tp2_R, tp3_R)
-# XAUUSD 15m: Gold volatile → nâng TP xa hơn để avg_win >> avg_loss
-# Default (FX pairs): (2.0, 2.5, 4.0)
 # ─────────────────────────────────────────────
 TP_MULTIPLIERS_OVERRIDE: dict = {
-    "XAUUSD": (1.0, 1.5, 2.0),   # TEST 1R
-    "XAGUSD": (1.0, 1.5, 2.0),   # TEST 1R
+    "XAUUSD": (2.0, 2.5, 3.0),   # TEST 2R
+    "XAGUSD": (1.0, 1.5, 2.0),
+    "EURUSD": (1.0, 1.5, 2.0),
+    "GBPUSD": (1.0, 1.5, 2.0),
 }
 
 # ─────────────────────────────────────────────
 # Per-symbol minimum RR (tps[0] / sl_dist)
-# Default: 1.5 (global MIN_RR)
-# XAUUSD/USDJPY: 2.0 — chỉ lấy setup có ít nhất 2R potential
 # ─────────────────────────────────────────────
 MIN_RR_OVERRIDE: dict = {
-    "XAUUSD": 0.8,   # TEST 1R
-    "XAGUSD": 0.8,   # TEST 1R
+    "XAUUSD": 0.8,
+    "XAGUSD": 0.8,
+    "EURUSD": 0.8,   # align với XAUUSD
+    "GBPUSD": 0.8,
 }
 
 # ─────────────────────────────────────────────
@@ -222,6 +224,16 @@ MIN_RR_OVERRIDE: dict = {
 # ─────────────────────────────────────────────
 CONSECUTIVE_LOSS_LIMIT: int = 999  # disabled
 CONSECUTIVE_LOSS_LIMIT_OVERRIDE: dict = {}
+
+# ─────────────────────────────────────────────
+# ORDER TYPE RESTRICTION
+# MARKET_ORDERS_ENABLED=false → toàn bộ hệ thống chỉ dùng LIMIT orders.
+# Backtest cho thấy MARKET fill tại bar close (ngoài zone midpoint) làm
+# SL buffer thu hẹp → stop-out nhiều hơn → performance tệ hơn LIMIT đáng kể.
+# ─────────────────────────────────────────────
+MARKET_ORDERS_ENABLED: bool = os.getenv("MARKET_ORDERS_ENABLED", "false").lower() == "true"
+# Per-symbol list giữ lại cho backward compat (không dùng nữa)
+LIMIT_ORDER_ONLY_SYMBOLS: list = []
 
 # ─────────────────────────────────────────────
 # ANTI-MARTINGALE POSITION SIZING
