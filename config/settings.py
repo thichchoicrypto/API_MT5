@@ -241,7 +241,7 @@ LIMIT_ORDER_ONLY_SYMBOLS: list = []
 # Bật: ANTI_MARTINGALE_ENABLED=true trong .env
 # ─────────────────────────────────────────────
 ANTI_MARTINGALE_ENABLED: bool = os.getenv("ANTI_MARTINGALE_ENABLED", "false").lower() == "true"
-ANTI_MARTINGALE_STEP:    float = 0.01    # +1% risk mỗi lần win liên tiếp
+ANTI_MARTINGALE_STEP:    float = 0.005   # +0.5% risk mỗi lần win liên tiếp
 ANTI_MARTINGALE_CAP:     float = 0.05    # tối đa 5% risk (5× base 1%)
 
 # ─────────────────────────────────────────────
