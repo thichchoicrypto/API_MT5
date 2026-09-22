@@ -201,7 +201,7 @@ RISK_PER_TRADE_OVERRIDE: dict = {
 # Per-symbol TP multipliers: (tp1_R, tp2_R, tp3_R)
 # ─────────────────────────────────────────────
 TP_MULTIPLIERS_OVERRIDE: dict = {
-    "XAUUSD": (2.0, 2.5, 3.0),   # TEST 2R
+    "XAUUSD": (2.0, 2.5, 3.0),   # 2R — best config
     "XAGUSD": (1.0, 1.5, 2.0),
     "EURUSD": (1.0, 1.5, 2.0),
     "GBPUSD": (1.0, 1.5, 2.0),

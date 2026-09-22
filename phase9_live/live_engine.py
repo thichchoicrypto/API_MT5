@@ -11,6 +11,7 @@ from config.settings import (
     SYMBOLS, TIMEFRAMES, ENTRY_TIMEFRAME, STRUCTURE_TIMEFRAME,
     BIAS_TIMEFRAME, MAX_OPEN_POSITIONS, MAX_LEVERAGE, RISK_PER_TRADE,
     LIMIT_ORDER_TIMEOUT_CANDLES, MARKET_ORDERS_ENABLED,
+    ADX_1H_FILTER_ENABLED, ADX_1H_MIN, ADX_1H_MIN_OVERRIDE,
 )
 from phase2_structure.structure_engine import StructureEngine
 from phase2_structure.mtf_bias import MTFBias
@@ -20,7 +21,7 @@ from phase3_liquidity.choch_detector import detect_choch, StructureShiftTracker
 from phase4_fvg_ob.fvg_engine import detect_fvg, update_fvg_fills, _calc_atr
 from phase4_fvg_ob.orderblock_engine import detect_all_obs, update_ob_mitigation
 from phase4_fvg_ob.zone_builder import find_confluence_zones, build_entry_zone
-from phase5_entry.entry_engine import EntryEngine
+from phase5_entry.entry_engine import EntryEngine, calc_adx
 from phase6_risk.risk_engine import RiskEngine
 from phase9_live.mt5_order_manager import MT5OrderManager, BOT_MAGIC
 from phase9_live.kill_switch import KillSwitch
@@ -491,6 +492,20 @@ class LiveTradingEngine:
             self._obs[symbol] = detect_all_obs(candles[-50:], struct.get("bos_events", []), symbol=symbol)
             self._obs[symbol] = update_ob_mitigation(self._obs[symbol], candles[-1])
             confluence = find_confluence_zones(self._fvgs[symbol], self._obs[symbol])
+
+            # ADX 1H Regime Filter — match backtest logic
+            # Skip entry nếu ADX 1h < threshold (macro ranging) — giống backtest_engine.py
+            if ADX_1H_FILTER_ENABLED:
+                buf_1h = self._candle_buffers.get(f"{symbol}_1h", [])
+                if len(buf_1h) >= 28:
+                    _adx_1h = calc_adx(buf_1h[-100:], period=14)
+                    _adx_min = ADX_1H_MIN_OVERRIDE.get(symbol, ADX_1H_MIN)
+                    if _adx_1h > 0 and _adx_1h < _adx_min:
+                        logger.info(
+                            f"[{symbol}] ADX_1H={_adx_1h:.1f} < {_adx_min} "
+                            f"(ranging) → skip entry"
+                        )
+                        return
 
             # Phase 5 + 6 + Execution
             # CHG-FX-027: tính cả LIMIT order đang pending (chưa fill) vào tổng số
