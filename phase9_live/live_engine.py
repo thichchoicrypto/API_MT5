@@ -823,6 +823,23 @@ class LiveTradingEngine:
         await telegram.send(msg)
         self._api_errors = 0
 
+        # Lấy real MT5 position ticket — có thể khác với LIMIT order ticket.
+        # Nếu không chuẩn ticket, get_last_closed_trade sẽ không tìm được deal
+        # khi position đóng → fallback về pnl=0.0 (bug cũ).
+        try:
+            mt5_pos = await self.order_manager.get_position_by_ticket(int(order_id))
+            if not mt5_pos:
+                mt5_pos = await self.order_manager.get_position(symbol)
+            if mt5_pos and str(mt5_pos["ticket"]) != order_id:
+                real_ticket = str(mt5_pos["ticket"])
+                logger.info(
+                    f"[{symbol}] Position ticket #{real_ticket} khác order ticket #{order_id} "
+                    f"— dùng position ticket để track close"
+                )
+                order_id = real_ticket
+        except Exception as _te:
+            logger.warning(f"[{symbol}] Không lấy được position ticket: {_te}")
+
         if hasattr(self, "_db") and self._db:
             await self._db.save_live_trade_open(
                 order_id=order_id,
